@@ -1,0 +1,30 @@
+{
+  "name": "jasminum",
+  "version": "0.0.0",
+  "description": "A light, modular, promissory, isomorphic Jasmine test scaffold clone",
+  "keywords": [
+    "jasmine",
+    "test",
+    "testing",
+    "bdd",
+    "promise",
+    "isomorphic"
+  ],
+  "main": "suite.js",
+  "bin": {
+    "jasminum": "./node-runner"
+  },
+  "browser": {
+    "reporter": "browser-reporter"
+  },
+  "dependencies": {
+    "collections": "*",
+    "glob": "~3.2.8",
+    "colors": "~0.6.2",
+    "optimist": "~0.6.1",
+    "q": "~1.0.0"
+  },
+  "scripts": {
+    "test": "node node-runner.js test"
+  }
+}
