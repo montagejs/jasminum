@@ -1,4 +1,4 @@
-var Suite = require("../suite");
-new Suite("Q").describe(function () {
+var Suite = require("../jasminum");
+new Suite("jasminum").describe(function () {
     require("./jasmine-test");
 }).runAndReport().done();

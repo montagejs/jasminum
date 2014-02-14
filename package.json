@@ -10,7 +10,7 @@
     "promise",
     "isomorphic"
   ],
-  "main": "suite.js",
+  "main": "jasminum.js",
   "bin": {
     "jasminum": "./node-runner"
   },
@@ -18,13 +18,16 @@
     "reporter": "browser-reporter"
   },
   "dependencies": {
-    "collections": "*",
+    "q": "~2.0",
+    "collections": "~2.0",
     "glob": "~3.2.8",
     "colors": "~0.6.2",
-    "optimist": "~0.6.1",
-    "q": "~1.0.0"
+    "optimist": "~0.6.1"
   },
   "scripts": {
-    "test": "node node-runner.js test"
+    "test": "node test/index.js"
+  },
+  "devDependencies": {
+    "mr": "~2.0"
   }
 }

@@ -1,7 +1,5 @@
 // vim:ts=4:sts=4:sw=4:
 
-var Q = require("q");
-
 module.exports = Test;
 
 function Test(name, callback, suite) {
@@ -14,22 +12,22 @@ function Test(name, callback, suite) {
 
 Test.prototype.type = "it";
 
-Test.prototype.run = function (report) {
+Test.prototype.run = function (report, Promise) {
     var self = this;
     var report = report.start(self);
     setCurrentTest(self);
     setCurrentReport(report);
-    return Q.try(function () {
+    return Promise.resolve().then(function () {
         if (!self.skip) {
             var context = {};
-            return Q.try(function () {
-                return self.beforeEach(context, report);
+            return Promise.resolve().then(function () {
+                return self.beforeEach(Promise, context, report);
             })
             .then(function () {
-                return self.call(self.callback, context, report, "during");
+                return self.call(self.callback, Promise, context, report, "during");
             })
             .finally(function () {
-                return self.afterEach(context, report);
+                return self.afterEach(Promise, context, report);
             })
         }
     })
@@ -45,7 +43,7 @@ Test.prototype.run = function (report) {
     });
 };
 
-Test.prototype.beforeEach = function (context, report) {
+Test.prototype.beforeEach = function (Promise, context, report) {
     var self = this;
     var heritage = this.heritage();
     return heritage.reduceRight(function (ready, suite) {
@@ -54,10 +52,10 @@ Test.prototype.beforeEach = function (context, report) {
                 return self.call(suite.beforeEach, context, report, "before");
             }
         });
-    }, Q());
+    }, Promise.resolve());
 };
 
-Test.prototype.afterEach = function (context, report) {
+Test.prototype.afterEach = function (Promise, context, report) {
     var self = this;
     var heritage = this.heritage();
     return heritage.reduceRight(function (ready, suite) {
@@ -66,7 +64,7 @@ Test.prototype.afterEach = function (context, report) {
                 return self.call(suite.afterEach, context, report, "after");
             }
         });
-    }, Q());
+    }, Promise.resolve());
 };
 
 Test.prototype.heritage = function () {
@@ -79,23 +77,76 @@ Test.prototype.heritage = function () {
     return heritage;
 };
 
-Test.prototype.call = function (callback, context, report, phase) {
-    function done(error) {
-        if (!deferred.promise.isPending()) {
-            report.error(new Error("`done` called multiple times " + phase + " " + JSON.stringify(test.name)), test);
-        }
-        if (error) {
-            deferred.reject(error);
-        } else {
-            deferred.resolve();
-        }
-    }
+Test.prototype.call = function (callback, Promise, context, report, phase) {
     if (callback.length === 1) {
-        var deferred = Q.defer();
-        callback.call(context, done);
-        return deferred.promise;
+        return new Promise(function (resolve, reject) {
+            var isDone;
+            function done(error) {
+                if (isDone) {
+                    report.error(new Error("`done` called multiple times " + phase + " " + JSON.stringify(test.name)), test);
+                }
+                isDone = true;
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve();
+                }
+            }
+            callback.call(context, done);
+        });
     } else {
         return callback.call(context);
+    }
+};
+
+Test.prototype.runSync = function (report) {
+    var report = report.start(this)
+    setCurrentTest(this);
+    setCurrentReport(report);
+    try {
+        if (!this.skip) {
+            if (this.callback.length > 0) {
+                throw new Error(
+                    "Can't run asynchronous tests without providing a " +
+                    "Promise constructor to 'run'"
+                );
+            }
+            var context = {};
+            try {
+                this.beforeEachSync(context);
+                this.callback.call(context);
+            } finally {
+                this.afterEachSync(context);
+            }
+        } else {
+            report.skip(this);
+        }
+    } catch (error) {
+        report.error(error, this);
+    } finally {
+        report.end(this);
+        setCurrentTest();
+        setCurrentReport();
+    }
+};
+
+Test.prototype.beforeEachSync = function (context) {
+    var heritage = this.heritage();
+    for (var index = heritage.length - 1; index >= 0; index--) {
+        var suite = heritage[index];
+        if (suite.beforeEach) {
+            suite.beforeEach.call(context);
+        }
+    }
+};
+
+Test.prototype.afterEachSync = function (context) {
+    var heritage = this.heritage();
+    for (var index = heritage.length - 1; index >= 0; index--) {
+        var suite = heritage[index];
+        if (suite.afterEach) {
+            suite.afterEach.call(context);
+        }
     }
 };
 

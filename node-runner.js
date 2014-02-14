@@ -3,6 +3,7 @@ var fs = require("fs");
 var glob = require("glob");
 var path = require("path");
 var optimist = require("optimist");
+var Q = require("q");
 
 var Suite = require("./suite");
 var Reporter = require("./reporter");
@@ -46,7 +47,7 @@ argv._.reduceRight(function (next, arg) {
     };
     var report = new Reporter(options);
 
-    suite.run(report, options)
+    suite.run(Q.Promise, report, options)
     .then(function () {
         report.summarize(suite);
     })

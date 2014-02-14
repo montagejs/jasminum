@@ -64,7 +64,7 @@ Node.js directly, or using a browser module loader, or to measure test coverage.
 ```js
 // test/index.js
 var Suite = require("jasminum");
-new Suite("Q").describe(function () {
+new Suite("my tests").describe(function () {
     require("./my-test");
 }).runAndReport().done();
 ```

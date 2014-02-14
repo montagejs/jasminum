@@ -11,6 +11,7 @@ function createSpy(identity, spied) {
         spy.mostRecentCall = call;
         spy.argsForCall.push(call.args);
         spy.calls.push(call);
+        spy.callCount++;
         if (spy.callThrough) {
             return spy.spied.apply(this, arguments);
         }
@@ -20,6 +21,7 @@ function createSpy(identity, spied) {
     spy.argsForCall = [];
     spy.spied = spied;
     spy.callThrough = false;
+    spy.callCount = 0;
     spy.andCallFake = function (fake) {
         spy.spied = fake;
         spy.callThrough = true;

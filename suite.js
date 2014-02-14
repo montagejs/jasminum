@@ -1,7 +1,5 @@
 // vim:ts=4:sts=4:sw=4:
 
-var Q = require("q");
-
 require("./dsl");
 
 var Test = require("./test");
@@ -13,7 +11,7 @@ module.exports = Suite;
 function Suite(name) {
     this.name = name;
     this.parent = null;
-    this.root = this;
+    this.root = this; // Unless overridden
     this.children = [];
     this.exclusive = false;
     this.beforeEach = null;
@@ -22,6 +20,9 @@ function Suite(name) {
 }
 
 Suite.prototype.type = "describe";
+
+// To be overriden if desired
+Suite.prototype.Promise = null;
 
 Suite.prototype.describe = function (callback) {
     setCurrentSuite(this);
@@ -34,19 +35,20 @@ Suite.prototype.describe = function (callback) {
 };
 
 Suite.prototype.nestSuite = function (name) {
-    var child = Object.create(this);
+    var child = new this.constructor();
+    child.root = this.root;
     child.parent = this;
     child.name = name;
     child.children = [];
     child.exclusive = false;
     this.children.push(child);
 
-    // Specialize the Expectation
-    function SuiteExpectation(value, report) {
-        Expectation.call(this, value, report);
-    }
-    SuiteExpectation.prototype = Object.create(this.Expectation.prototype);
-    child.Expectation = SuiteExpectation;
+    //// Specialize the Expectation
+    //function SuiteExpectation(value, report) {
+    //    Expectation.call(this, value, report);
+    //}
+    //SuiteExpectation.prototype = Object.create(this.Expectation.prototype);
+    //child.Expectation = SuiteExpectation;
 
     return child;
 };
@@ -67,9 +69,10 @@ Suite.prototype.setExclusive = function () {
     }
 };
 
-Suite.prototype.run = function (report) {
+Suite.prototype.run = function (report, Promise) {
     var self = this;
-    if (self.skip) return Q();
+    Promise = Promise || this.Promise;
+    if (self.skip) return Promise.resolve();
     var exclusiveChildren = this.children.filter(function (child) {
         return child.exclusive;
     });
@@ -77,25 +80,53 @@ Suite.prototype.run = function (report) {
     var suiteReport = report.start(this);
     return children.reduce(function (ready, child) {
         return ready.then(function () {
-            return child.run(suiteReport);
+            return child.run(suiteReport, Promise);
         });
-    }, Q())
+    }, Promise.resolve())
     .finally(function () {
         suiteReport.end(self);
     });
 
 };
 
-Suite.prototype.runAndReport = function (options) {
+Suite.prototype.runSync = function (report) {
+    if (!this.skip) {
+        var exclusiveChildren = this.children.filter(function (child) {
+            return child.exclusive;
+        });
+        var children = exclusiveChildren.length ? exclusiveChildren : this.children;
+        var suiteReport = report.start(this);
+        try {
+            for (var index = 0; index < children.length; index++) {
+                var child = children[index];
+                child.runSync(suiteReport);
+            }
+        } finally {
+            suiteReport.end(this);
+        }
+    }
+};
+
+Suite.prototype.runAndReport = function (Promise, options) {
     var report = new this.Reporter();
     var self = this;
-    return this.run(report, options)
+    return this.run(report, Promise)
     .then(function () {
         report.summarize(self, options)
         if (report.exit) {
-            report.exit();
+            return report.exit();
         }
     });
+};
+
+Suite.prototype.runAndReportSync = function (options) {
+    var report = new this.Reporter();
+    var self = this;
+    this.runSync(report, options)
+    report.summarize(self, options)
+    if (report.exit) {
+        report.exit();
+    }
 };
 
 Suite.prototype.Test = Test;

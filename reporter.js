@@ -21,7 +21,7 @@ Reporter.prototype.start = function (test) {
     child.depth = this.depth + 1;
     child.failed = false;
     child.skipped = false;
-    var message = (Array(child.depth + 1).join("❯") + " " + test.type + " " + test.name);
+    var message = (Array(child.depth + 1).join("❯") + " " + test.type + " " + test.name + (test.async ? " async".white : ""));
     if (test.skip) {
         message = message.cyan;
     } else {
@@ -58,7 +58,7 @@ Reporter.prototype.summarize = function (suite) {
     } else {
         console.log(this.passed + " passed tests");
     }
-    if (!this.failedAssertions && this.passedAssertions) {
+    if (!this.failedAssertions && this.passedAssertions && !this.failed && this.passed) {
         console.log((this.passedAssertions + " passed assertions").green);
     } else {
         console.log(this.passedAssertions + " passed assertions");
