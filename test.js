@@ -29,6 +29,8 @@ Test.prototype.run = function (report, Promise) {
             .finally(function () {
                 return self.afterEach(Promise, context, report);
             })
+        } else {
+            report.skip(self);
         }
     })
     .then(function (value) {

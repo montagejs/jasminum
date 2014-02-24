@@ -23,7 +23,7 @@ Reporter.prototype.start = function (test) {
     child.skipped = false;
     var message = (Array(child.depth + 1).join("❯") + " " + test.type + " " + test.name + (test.async ? " async".white : ""));
     if (test.skip) {
-        message = message.cyan;
+        message = (message + " (skipped)").cyan;
     } else {
         message = message.grey;
     }
@@ -84,7 +84,7 @@ Reporter.prototype.summarize = function (suite) {
     }
 };
 
-Reporter.prototype.skip = function () {
+Reporter.prototype.skip = function (test) {
     this.skipped = true;
     this.root.skipped++;
 };

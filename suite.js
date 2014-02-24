@@ -17,6 +17,7 @@ function Suite(name) {
     this.beforeEach = null;
     this.afterEach = null;
     this.testCount = 0;
+    this.skip = false;
 }
 
 Suite.prototype.type = "describe";
@@ -72,17 +73,22 @@ Suite.prototype.setExclusive = function () {
 Suite.prototype.run = function (report, Promise) {
     var self = this;
     Promise = Promise || this.Promise;
-    if (self.skip) return Promise.resolve();
-    var exclusiveChildren = this.children.filter(function (child) {
-        return child.exclusive;
-    });
-    var children = exclusiveChildren.length ? exclusiveChildren : this.children;
     var suiteReport = report.start(this);
-    return children.reduce(function (ready, child) {
-        return ready.then(function () {
-            return child.run(suiteReport, Promise);
-        });
-    }, Promise.resolve())
+    return Promise.resolve().then(function () {
+        if (!self.skip) {
+            var exclusiveChildren = self.children.filter(function (child) {
+                return child.exclusive;
+            });
+            var children = exclusiveChildren.length ? exclusiveChildren : self.children;
+            return children.reduce(function (ready, child) {
+                return ready.then(function () {
+                    return child.run(suiteReport, Promise);
+                });
+            }, Promise.resolve())
+        } else {
+            suiteReport.skip(self);
+        }
+    })
     .finally(function () {
         suiteReport.end(self);
     });
@@ -90,12 +96,12 @@ Suite.prototype.run = function (report, Promise) {
 };
 
 Suite.prototype.runSync = function (report) {
+    var suiteReport = report.start(this);
     if (!this.skip) {
         var exclusiveChildren = this.children.filter(function (child) {
             return child.exclusive;
         });
         var children = exclusiveChildren.length ? exclusiveChildren : this.children;
-        var suiteReport = report.start(this);
         try {
             for (var index = 0; index < children.length; index++) {
                 var child = children[index];
@@ -104,6 +110,9 @@ Suite.prototype.runSync = function (report) {
         } finally {
             suiteReport.end(this);
         }
+    } else {
+        suiteReport.skip(this);
+        suiteReport.end(this);
     }
 };
 
