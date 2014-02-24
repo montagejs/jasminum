@@ -15,7 +15,7 @@
     "jasminum": "node-runner.js"
   },
   "browser": {
-    "reporter": "browser-reporter"
+    "reporter": "browser/reporter"
   },
   "dependencies": {
     "q": "~2.0",
