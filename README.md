@@ -248,9 +248,11 @@ Jasminum does not automatically run tests whenever tests or their dependencies
 change, but such a contraption is easy to imagine based on the dependency graph
 that [Mr][] can produce.
 
-Jasminum does not provide fancy spies. It would not include the spy interface
-from Jasmine 1.3 if it could do so in good conscience. For fancy spies, again,
-please seek refuge in `npm` and in Jasminum’s extensibility.
+Jasminum provides Jasmine 1.3 spies to ease migration. However, please migrate
+to an external spy package like [Sinon][] for spies. Jasmine spies will be
+removed in a future release.
+
+[Sinon]: http://sinonjs.org/
 
 ## Extensible
 

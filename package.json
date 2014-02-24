@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "q": "~2.0",
-    "collections": "~2.0",
+    "collections": "~1.0",
     "glob": "~3.2.8",
     "colors": "~0.6.2",
     "optimist": "~0.6.1"
