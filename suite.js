@@ -44,12 +44,12 @@ Suite.prototype.nestSuite = function (name) {
     child.exclusive = false;
     this.children.push(child);
 
-    //// Specialize the Expectation
-    //function SuiteExpectation(value, report) {
-    //    Expectation.call(this, value, report);
-    //}
-    //SuiteExpectation.prototype = Object.create(this.Expectation.prototype);
-    //child.Expectation = SuiteExpectation;
+    // Specialize the Expectation
+    function SuiteExpectation(value, report) {
+        Expectation.call(this, value, report);
+    }
+    SuiteExpectation.prototype = Object.create(this.Expectation.prototype);
+    child.Expectation = SuiteExpectation;
 
     return child;
 };
