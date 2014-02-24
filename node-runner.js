@@ -38,8 +38,10 @@ argv._.reduceRight(function (next, arg) {
 
     var suite = new Suite("").describe(function () {
         files.forEach(function (file) {
-            console.log(file.grey);
-            require(file);
+            describe(file, function () {
+                console.log(file.grey);
+                require(file);
+            });
         });
     });
     var options = {
