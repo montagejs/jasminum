@@ -12,7 +12,7 @@
   ],
   "main": "jasminum.js",
   "bin": {
-    "jasminum": "./node-runner"
+    "jasminum": "node-runner.js"
   },
   "browser": {
     "reporter": "browser-reporter"
