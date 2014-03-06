@@ -3,11 +3,7 @@ var Expectation = require("./expectation");
 
 module.exports = SpyExpectation;
 function SpyExpectation(value, report) {
-    this.value = value;
-    this.report = report;
-    this.not = Object.create(this);
-    this.not.isNot = true;
-    this.not.not = this;
+    Expectation.call(this, value, report);
 }
 
 SpyExpectation.prototype = Object.create(Expectation.prototype);
