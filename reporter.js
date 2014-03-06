@@ -1,4 +1,5 @@
 
+var util = require("util");
 require("colors");
 
 module.exports = Reporter;
@@ -107,9 +108,9 @@ Reporter.prototype.failUnaryAssertion = function (assertion) {
 
 Reporter.prototype.failBinaryAssertion = function (assertion) {
     console.log("expected".red);
-    console.log(assertion.expected);
+    console.log(util.inspect(assertion.expected, {colors: true, depth: null}));
     console.log(assertion.operator.red);
-    console.log(assertion.actual);
+    console.log(util.inspect(assertion.actual, {colors: true, depth: null}));
     console.log("at".red);
     console.error(assertion.stack);
     this.failed = true;
