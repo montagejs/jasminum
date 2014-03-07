@@ -18,8 +18,8 @@
     "reporter": "browser/reporter"
   },
   "dependencies": {
-    "q": "~2.0",
-    "collections": "~1.0",
+    "q": "~1.0.0",
+    "collections": "~1.0.1",
     "glob": "~3.2.8",
     "colors": "~0.6.2",
     "optimist": "~0.6.1"
@@ -28,6 +28,6 @@
     "test": "node test/index.js"
   },
   "devDependencies": {
-    "mr": "~2.0"
+    "mr": "~0.15.4"
   }
 }
