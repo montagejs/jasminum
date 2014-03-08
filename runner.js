@@ -2,9 +2,8 @@
 
 var search = require("./search");
 var optimist = require("optimist");
-var Q = require("q");
 
-var Suite = require("./suite");
+var Suite = require("./jasminum");
 var Reporter = require("./reporter");
 
 var argv = optimist.argv;
@@ -28,8 +27,7 @@ search(argv._).then(function (files) {
     var report = new Reporter(options);
 
     return suite.runAndReport({
-        report: report,
-        Promise: Q.Promise
+        report: report
     });
 })
 .done();

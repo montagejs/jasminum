@@ -130,16 +130,18 @@ Reporter.prototype.error = function (error, test) {
 
 Reporter.prototype.enter = function () {
     var self = this;
-    this.exitListener = function () {
+    this.exitListener = function (code) {
         self.failed++;
         console.log("test never completes: add a timeout".red);
-        self.exit();
+        self.exit(code !== 0);
     };
     process.on("exit", this.exitListener);
 };
 
-Reporter.prototype.exit = function () {
+Reporter.prototype.exit = function (exiting) {
     process.removeListener("exit", this.exitListener);
-    process.exit(this.failed ? -1 : 0);
+    if (!exiting) {
+        process.exit(this.failed ? -1 : 0);
+    }
 };
 
