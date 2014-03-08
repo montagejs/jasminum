@@ -50,11 +50,10 @@ argv._.reduceRight(function (next, arg) {
     };
     var report = new Reporter(options);
 
-    suite.run(report, Q.Promise)
-    .then(function () {
-        report.summarize(suite);
-    })
-    .done();
+    suite.runAndReport({
+        report: report,
+        Promise: Q.Promise
+    }).done();
 
 })(null, []);
 
