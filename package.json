@@ -12,7 +12,8 @@
   ],
   "main": "jasminum.js",
   "bin": {
-    "jasminum": "runner.js"
+    "jasminum": "runner.js",
+    "jasminum-phantom": "phantom/runner.js"
   },
   "browser": {
     "reporter": "browser/reporter"
@@ -22,12 +23,14 @@
     "collections": "~1.0.1",
     "glob": "~3.2.8",
     "colors": "~0.6.2",
-    "optimist": "~0.6.1"
+    "optimist": "~0.6.1",
+    "qs": "~0.6.6",
+    "mr": "~0.15.4",
+    "joey": "~1.5.1",
+    "url": "~0.7.9"
   },
   "scripts": {
-    "test": "node test/index.js"
-  },
-  "devDependencies": {
-    "mr": "~0.15.4"
+    "test": "node runner.js test/jasmine-test.js",
+    "test:phantom": "node phantom/runner.js test/jasmine-test.js"
   }
 }

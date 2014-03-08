@@ -1,5 +1,4 @@
 
-var util = require("util");
 require("colors");
 
 module.exports = Reporter;
@@ -108,9 +107,9 @@ Reporter.prototype.failUnaryAssertion = function (assertion) {
 
 Reporter.prototype.failBinaryAssertion = function (assertion) {
     console.log("expected".red);
-    console.log(util.inspect(assertion.expected, {colors: true, depth: null}));
+    console.log(assertion.expected);
     console.log(assertion.operator.red);
-    console.log(util.inspect(assertion.actual, {colors: true, depth: null}));
+    console.log(assertion.actual);
     console.log("at".red);
     console.error(assertion.stack);
     this.failed = true;
@@ -128,20 +127,11 @@ Reporter.prototype.error = function (error, test) {
     console.error(error && error.stack ? error.stack : error);
 };
 
-Reporter.prototype.enter = function () {
-    var self = this;
-    this.exitListener = function (code) {
-        self.failed++;
-        console.log("test never completes: add a timeout".red);
-        self.exit(code !== 0);
-    };
-    process.on("exit", this.exitListener);
-};
-
-Reporter.prototype.exit = function (exiting) {
-    process.removeListener("exit", this.exitListener);
-    if (!exiting) {
-        process.exit(this.failed ? -1 : 0);
+Reporter.prototype.exit = function () {
+    if (this.failed) {
+        alert("Jasminum tests failed.");
+    } else {
+        alert("Jasminum tests completed.");
     }
 };
 

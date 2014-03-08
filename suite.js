@@ -116,10 +116,14 @@ Suite.prototype.runSync = function (report) {
     }
 };
 
-Suite.prototype.runAndReport = function (Promise, options) {
-    var report = new this.Reporter();
+Suite.prototype.runAndReport = function (options) {
+    options = options || {};
+    var report = options.report || new (options.Reporter || this.Reporter)();
     var self = this;
-    return this.run(report, Promise)
+    if (report.enter) {
+        report.enter();
+    }
+    return this.run(report, options.Promise)
     .then(function () {
         report.summarize(self, options)
         if (report.exit) {
@@ -129,8 +133,12 @@ Suite.prototype.runAndReport = function (Promise, options) {
 };
 
 Suite.prototype.runAndReportSync = function (options) {
-    var report = new this.Reporter();
+    options = options || {};
+    var report = options.report || new (options.Reporter || this.Reporter)();
     var self = this;
+    if (report.enter) {
+        report.enter();
+    }
     this.runSync(report, options)
     report.summarize(self, options)
     if (report.exit) {
