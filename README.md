@@ -58,6 +58,21 @@ test until it fails, test names, and all of their parent suite names, will be
 logged *after* the test fails instead of before. Arrows draw your attention to
 this nuance.
 
+With [PhantomJS] installed, Jasminum can run the same tests in the PhantomJS
+headless browser. The interface and reports are identical.
+
+```
+❯ jasminum-phantom test
+1 tests passed
+1 assertions passed
+0 tests failed
+0 assertions failed
+0 errors
+0 tests skipped
+```
+
+[PhantomJS]: http://phantomjs.org/
+
 You can create an “isomorphic” test runner that you can use to run tests in
 Node.js directly, or using a browser module loader, or to measure test coverage.
 
@@ -126,7 +141,8 @@ This will cause `npm run cover` to run coverage and display the results.
         "opener": "*"
     },
     "scripts": {
-        "test": "node test/index.js",
+        "test": "jasminum test",
+        "test:phantom": "jasminum-phantom test",
         "cover": "istanbul cover test/index.js && istanbul report html && opener coverage/index.html"
     }
 }
