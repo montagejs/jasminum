@@ -10,11 +10,50 @@ SpyExpectation.prototype = Object.create(Expectation.prototype);
 
 SpyExpectation.prototype.constructor = SpyExpectation;
 
-SpyExpectation.prototype.toHaveBeenCalled = Expectation.unaryMethod(function () {
-    return this.value.argsForCall.length > 0;
-}, "to have been called");
+SpyExpectation.prototype.toHaveBeenCalled = function () {
+    if (this.value.displayName) {
+        this.report.assert(this.value.argsForCall.length > 0 !== this.isNot, [
+            "expected function", "to have been called"
+        ], [
+            this.value.displayName
+        ]);
+    } else {
+        this.report.assert(this.value.argsForCall.length > 0 !== this.isNot, [
+            "expected function to have been called"
+        ], []);
+    }
+};
 
 SpyExpectation.prototype.toHaveBeenCalledWith = function () {
-    expect(this.value.argsForCall).toContain(Array.prototype.slice.call(arguments));
+    var args = Array.prototype.slice.call(arguments);
+    var guard = Object.has(this.value.argsForCall, args, Object.equals);
+    if (this.value.displayName) {
+        this.report.assert(
+            !guard === this.isNot,
+            [
+                "expected function",
+                (this.isNot ? "not " : "") + "to have been called with",
+                "but had only these calls"
+            ],
+            [
+                this.value.displayName,
+                args,
+                this.value.argsForCall
+            ]
+        );
+    } else {
+        this.report.assert(
+            !guard === this.isNot,
+            [
+                "expected function " +
+                (this.isNot ? "not " : "") + "to have been called with",
+                "but had only these calls"
+            ],
+            [
+                args,
+                this.value.argsForCall
+            ]
+        );
+    }
 };
 

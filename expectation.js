@@ -5,89 +5,27 @@ module.exports = Expectation;
 function Expectation(value, report) {
     this.value = value;
     this.report = report;
+    this.isNot = false;
     this.not = Object.create(this);
     this.not.isNot = true;
     this.not.not = this;
 }
 
-function getStackTrace() {
-    var stack = new Error("").stack;
-    if (typeof stack === "string") {
-        return stack.replace(/^[^\n]*\n[^\n]\n/, "");
-    } else {
-        return stack;
-    }
-}
-
-Expectation.prototype.unaryExpectation = function (operator, operatorName) {
-    var guard = operator.call(this, this.value);
-    var stack = getStackTrace();
-    var assertion = {
-        operator: (this.isNot ? "not " : "") + operatorName,
-        not: this.isNot,
-        expected: this.value,
-        stack: stack || ""
-    };
-    if (!!guard === !!this.isNot) {
-        this.report.failUnaryAssertion(assertion);
-    } else {
-        this.report.passAssertion(assertion);
-    }
-};
-
-Expectation.prototype.binaryExpectation = function (operator, operatorName, value) {
-    var guard = operator.call(this, this.value, value);
-    var stack = getStackTrace();
-    var assertion = {
-        operator: (this.isNot ? "not " : "") + operatorName,
-        not: this.isNot,
-        expected: this.value,
-        actual: value,
-        stack: stack || ""
-    };
-    if (!!guard === !!this.isNot) {
-        this.report.failBinaryAssertion(assertion);
-    } else {
-        this.report.passAssertion(assertion);
-    }
-};
-
-Expectation.prototype.naryExpectation = function (operator, operatorName, args) {
-    args.unshift(this.value);
-    var guard = operator.apply(this, args);
-    var stack = getStackTrace();
-    var assertion = {
-        operator: (this.isNot ? "not " : "") + operatorName,
-        not: this.isNot,
-        expected: this.value,
-        actual: args[0],
-        stack: stack || ""
-    };
-    if (!!guard === !!this.isNot) {
-        this.report.failBinaryAssertion(assertion);
-    } else {
-        this.report.passAssertion(assertion);
-    }
-};
-
-Expectation.unaryMethod = expectationUnaryMethod;
-function expectationUnaryMethod(operator, operatorName) {
-    return function (value) {
-        return this.unaryExpectation(operator, operatorName, value);
-    };
-}
-
 Expectation.binaryMethod = expectationBinaryMethod;
 function expectationBinaryMethod(operator, operatorName) {
     return function (value) {
-        return this.binaryExpectation(operator, operatorName, value);
-    };
-}
-
-Expectation.naryMethod = expectationNaryMethod;
-function expectationNaryMethod(operator, operatorName) {
-    return function () {
-        return this.naryExpectation(operator, operatorName, Array.prototype.slice.call(arguments));
+        var guard = operator.call(this, this.value, value);
+        this.report.assert(
+            !guard === this.isNot,
+            [
+                "expected",
+                (this.isNot ? "not " : "") + operatorName
+            ],
+            [
+                this.value,
+                value
+            ]
+        );
     };
 }
 
@@ -145,12 +83,80 @@ function near(a, b, epsilon) {
     }
 }
 
+Expectation.prototype.toBeNear = function (value, epsilon) {
+    var guard = close(this.value, value, precision);
+    this.report.assert(
+        !guard === this.isNot,
+        [
+            "expected",
+            (this.isNot ? "not " : "") + " to be near",
+            "within",
+            "above or below"
+        ],
+        [
+            this.value,
+            value,
+            epsilon
+        ]
+    );
+};
+
 function close(a, b, precision) {
     return near(a, b, Math.pow(10, -precision));
 }
 
-Expectation.prototype.toBeNear = Expectation.naryMethod(near, "to be near to");
-Expectation.prototype.toBeCloseTo = Expectation.naryMethod(close, "to be close to");
+Expectation.prototype.toBeCloseTo = function (value, precision) {
+    var guard = close(this.value, value, precision);
+    this.report.assert(
+        !guard === this.isNot,
+        [
+            "expected",
+            (this.isNot ? "not " : "") + "to be close to",
+            "within",
+            "digits of precision"
+        ],
+        [
+            this.value,
+            value,
+            precision
+        ]
+    );
+};
+
+Expectation.prototype.toBeBetween = function (low, high) {
+    var guard = Object.compare(low, this.value) > 0 && Object.compare(high, this.value) < 0;
+    this.report.assert(
+        !guard === this.isNot,
+        [
+            "expected",
+            (this.isNot ? "not " : "") + " to be between",
+            "and"
+        ],
+        [
+            this.value,
+            low,
+            high
+        ]
+    );
+};
+
+Expectation.prototype.toBeInRange = function (low, high) {
+    var guard = Object.compare(low, this.value) >= 0 && Object.compare(high, this.value) < 0;
+    this.report.assert(
+        !guard === this.isNot,
+        [
+            "expected",
+            (this.isNot ? "not " : "") + " to be within the interval",
+            "inclusive to",
+            "exclusive"
+        ],
+        [
+            this.value,
+            low,
+            high
+        ]
+    );
+};
 
 function match(a, b) {
     if (typeof b === "string") {
@@ -165,22 +171,24 @@ Expectation.prototype.toThrow = function () {
     if (this.isNot) {
         try {
             this.value();
-            this.report.passAssertion();
+            this.report.assert(true, [
+                "expected function not to throw"
+            ], []);
         } catch (error) {
-            this.report.failAssertion({
-                message: "expected function not to throw",
-                stack: getStackTrace()
-            });
+            this.report.assert(false, [
+                "expected function not to throw but threw"
+            ], [error]);
         }
     } else {
         try {
             this.value();
-            this.report.failAssertion({
-                message: "expected function to throw",
-                stack: getStackTrace()
-            });
+            this.report.assert(false, [
+               "expected function to throw"
+            ], []);
         } catch (error) {
-            this.report.passAssertion();
+            this.report.assert(true, [
+               "expected function to throw"
+            ], []);
         }
     }
 };

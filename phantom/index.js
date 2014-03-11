@@ -1,12 +1,12 @@
 
 var Q = require("q");
 var Require = require("mr");
-var URL = require("mr/url");
+var URL = require("url");
 var QS = require("qs");
 require("colors");
 
 var Suite = require("../jasminum");
-var Reporter = require("./reporter");
+var Reporter = require("../reporter");
 
 var location = URL.resolve(window.location, "/");
 var query = QS.parse(window.location.search.slice(1));
