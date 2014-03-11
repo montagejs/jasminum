@@ -1,6 +1,6 @@
 {
   "name": "jasminum",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A light, modular, promissory, isomorphic Jasmine test scaffold clone",
   "keywords": [
     "jasmine",
