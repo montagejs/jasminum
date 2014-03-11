@@ -2,6 +2,15 @@
 var util = require("util");
 require("colors");
 
+function getStackTrace() {
+    var stack = new Error("").stack;
+    if (typeof stack === "string") {
+        return stack.replace(/^[^\n]*\n[^\n]\n/, "");
+    } else {
+        return stack;
+    }
+}
+
 module.exports = Reporter;
 function Reporter(options) {
     options = options || {};
@@ -53,6 +62,51 @@ Reporter.prototype.end = function (test) {
     }
 };
 
+Reporter.prototype.skip = function (test) {
+    this.skipped = true;
+    this.root.skipped++;
+};
+
+Reporter.prototype.assert = function (guard, messages, objects) {
+    if (!guard) {
+        for (var index = 0; index < Math.max(messages.length, objects.length); index++) {
+            if (index < messages.length) {
+                console.log(("" + messages[index]).red);
+            }
+            if (index < objects.length) {
+                console.log(util.inspect(objects[index], {colors: true, depth: null}));
+            }
+        }
+        var stack = getStackTrace();
+        if (stack) {
+            console.log(stack);
+        }
+        this.failed = true;
+        this.root.failedAssertions++;
+    } else {
+        this.root.passedAssertions++;
+    }
+};
+
+Reporter.prototype.error = function (error, test) {
+    this.failed = true;
+    this.root.errors++;
+    console.log("error".red);
+    console.error(error && error.stack ? error.stack : error);
+};
+
+Reporter.prototype.enter = function () {
+    if (typeof alert === "undefined") {
+        var self = this;
+        this.exitListener = function (code) {
+            self.failed++;
+            console.log("test never completes: add a timeout".red);
+            self.exit(code !== 0);
+        };
+        process.on("exit", this.exitListener);
+    }
+};
+
 Reporter.prototype.summarize = function (suite) {
     if (!this.failed && this.passed) {
         console.log((this.passed + " passed tests").green);
@@ -85,63 +139,20 @@ Reporter.prototype.summarize = function (suite) {
     }
 };
 
-Reporter.prototype.skip = function (test) {
-    this.skipped = true;
-    this.root.skipped++;
-};
-
-Reporter.prototype.failAssertion = function (assertion) {
-    console.log(("" + assertion.message).red);
-    console.error(assertion.stack);
-    this.failed = true;
-    this.root.failedAssertions++;
-};
-
-Reporter.prototype.failUnaryAssertion = function (assertion) {
-    console.log(("expected " + assertion.message).red);
-    console.log(assertion.expected);
-    console.log("at".red);
-    console.error(assertion.stack);
-    this.failed = true;
-    this.root.failedAssertions++;
-};
-
-Reporter.prototype.failBinaryAssertion = function (assertion) {
-    console.log("expected".red);
-    console.log(util.inspect(assertion.expected, {colors: true, depth: null}));
-    console.log(assertion.operator.red);
-    console.log(util.inspect(assertion.actual, {colors: true, depth: null}));
-    console.log("at".red);
-    console.error(assertion.stack);
-    this.failed = true;
-    this.root.failedAssertions++;
-};
-
-Reporter.prototype.passAssertion = function () {
-    this.root.passedAssertions++;
-};
-
-Reporter.prototype.error = function (error, test) {
-    this.failed = true;
-    this.root.errors++;
-    console.log("error".red);
-    console.error(error && error.stack ? error.stack : error);
-};
-
-Reporter.prototype.enter = function () {
-    var self = this;
-    this.exitListener = function (code) {
-        self.failed++;
-        console.log("test never completes: add a timeout".red);
-        self.exit(code !== 0);
-    };
-    process.on("exit", this.exitListener);
-};
-
 Reporter.prototype.exit = function (exiting) {
-    process.removeListener("exit", this.exitListener);
-    if (!exiting) {
-        process.exit(this.failed ? -1 : 0);
+    if (typeof alert === "undefined") {
+        // Node.js
+        process.removeListener("exit", this.exitListener);
+        if (!exiting) {
+            process.exit(this.failed ? -1 : 0);
+        }
+    } else {
+        // PhantomJS
+        if (this.failed) {
+            alert("Jasminum tests failed.");
+        } else {
+            alert("Jasminum tests completed.");
+        }
     }
 };
 

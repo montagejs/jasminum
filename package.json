@@ -16,7 +16,7 @@
     "jasminum-phantom": "phantom/runner.js"
   },
   "browser": {
-    "reporter": "browser/reporter"
+    "platform-reporter": "browser/reporter"
   },
   "dependencies": {
     "q": "~1.0.0",
@@ -27,7 +27,8 @@
     "qs": "~0.6.6",
     "mr": "~0.15.4",
     "joey": "~1.5.1",
-    "url": "~0.7.9"
+    "url": "~0.7.9",
+    "util": "^0.10.3"
   },
   "scripts": {
     "test": "node runner.js test/jasmine-test.js",

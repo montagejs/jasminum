@@ -4,7 +4,7 @@ require("./dsl");
 
 var Test = require("./test");
 var Expectation = require("./expectation");
-var Reporter = require("./reporter");
+var Reporter = require("./platform-reporter");
 
 module.exports = Suite;
 

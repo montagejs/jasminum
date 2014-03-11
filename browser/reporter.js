@@ -39,6 +39,40 @@ Reporter.prototype.end = function (test) {
     console.groupEnd();
 };
 
+Reporter.prototype.skip = function () {
+    this.skipped = true;
+    this.root.skipped++;
+};
+
+Reporter.prototype.assert = function (guard, messages, objects) {
+    if (guard) {
+        this.root.passedAssertions++;
+    } else {
+        var interleaved = [];
+        var format = [];
+        for (var index = 0; index < Math.max(messages.length, objects.length); index++) {
+            if (index < messages.length) {
+                format.push("%s");
+                interleaved.push(messages[index]);
+            }
+            if (index < objects.length) {
+                format.push("%O");
+                interleaved.push(objects[index]);
+            }
+        }
+        //interleaved.unshift(format.join(" "));
+        console.log.apply(console, interleaved);
+        this.failed = true;
+        this.root.failedAssertions++;
+    }
+};
+
+Reporter.prototype.error = function (error, test) {
+    this.failed = true;
+    this.root.errors++;
+    console.log(error.stack);
+};
+
 Reporter.prototype.summarize = function (suite) {
     if (!this.failed) {
         body.classList.add("pass");
@@ -58,41 +92,5 @@ Reporter.prototype.summarize = function (suite) {
     console.log(this.errors + " errors");
     var skipped = suite.testCount - this.passed - this.failed;
     console.log(skipped + " skipped tests");
-};
-
-Reporter.prototype.skip = function () {
-    this.skipped = true;
-    this.root.skipped++;
-};
-
-Reporter.prototype.failUnaryAssertion = function (assertion) {
-    this.failed = true;
-    this.root.failedAssertions++;
-};
-
-Reporter.prototype.failBinaryAssertion = function (assertion) {
-    console.error(
-        "expected",
-        assertion.expected,
-        assertion.operator,
-        assertion.actual
-    );
-    this.failed = true;
-    this.root.failedAssertions++;
-};
-
-Reporter.prototype.failNaryAssertion = function (assertion) {
-    this.failed = true;
-    this.root.failedAssertions++;
-};
-
-Reporter.prototype.passAssertion = function () {
-    this.root.passedAssertions++;
-};
-
-Reporter.prototype.error = function (error, test) {
-    this.failed = true;
-    this.root.errors++;
-    console.log(error.stack);
 };
 
