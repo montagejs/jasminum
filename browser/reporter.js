@@ -65,6 +65,12 @@ Reporter.prototype.skip = function () {
     this.root.skipped++;
 };
 
+Reporter.prototype.failAssertion = function (assertion) {
+    console.error(assertion.message);
+    this.failed = true;
+    this.root.failedAssertions++;
+};
+
 Reporter.prototype.failUnaryAssertion = function (assertion) {
     this.failed = true;
     this.root.failedAssertions++;
