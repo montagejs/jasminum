@@ -28,7 +28,7 @@ function search(args) {
             });
         };
     }, function (list) {
-        return list;
+        return Q(list);
     })([]);
 }
 

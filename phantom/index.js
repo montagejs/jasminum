@@ -3,7 +3,6 @@ var Q = require("q");
 var Require = require("mr");
 var URL = require("url");
 var QS = require("qs");
-require("colors");
 
 var Suite = require("../jasminum");
 var Reporter = require("../reporter");
