@@ -6,14 +6,21 @@ var optimist = require("optimist");
 var Suite = require("./jasminum");
 var Reporter = require("./reporter");
 
-var argv = optimist.argv;
+var argv = optimist
+    .boolean(["p", "passes"])
+    .boolean(["f", "failures"])
+    .argv;
 
 search(argv._).then(function (files) {
 
     var suite = new Suite("").describe(function () {
         files.forEach(function (file) {
             describe(file, function () {
-                console.log(file.grey);
+                if (process.stdout.isTTY) {
+                    console.log(file.grey);
+                } else {
+                    console.log(file);
+                }
                 require(file);
             });
         });
@@ -21,7 +28,7 @@ search(argv._).then(function (files) {
 
     var options = {
         showFails: argv.f || argv.failures,
-        showSkips: argv.s || argv.skips // TODO
+        showPasses: argv.p || argv.passes
     };
 
     var report = new Reporter(options);

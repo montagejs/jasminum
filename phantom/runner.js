@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 
 var ChildProcess = require("child_process");
 var Q = require("q");

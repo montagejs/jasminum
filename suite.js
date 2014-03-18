@@ -26,6 +26,10 @@ Suite.prototype.type = "describe";
 Suite.prototype.Promise = null;
 
 Suite.prototype.describe = function (callback) {
+    if (!callback) {
+        this.skip = true;
+        return this;
+    }
     setCurrentSuite(this);
     try {
         callback();
@@ -118,7 +122,7 @@ Suite.prototype.runSync = function (report) {
 
 Suite.prototype.runAndReport = function (options) {
     options = options || {};
-    var report = options.report || new (options.Reporter || this.Reporter)();
+    var report = options.report || new (options.Reporter || this.Reporter)(options);
     var self = this;
     if (report.enter) {
         report.enter();
@@ -134,7 +138,7 @@ Suite.prototype.runAndReport = function (options) {
 
 Suite.prototype.runAndReportSync = function (options) {
     options = options || {};
-    var report = options.report || new (options.Reporter || this.Reporter)();
+    var report = options.report || new (options.Reporter || this.Reporter)(options);
     var self = this;
     if (report.enter) {
         report.enter();

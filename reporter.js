@@ -2,6 +2,16 @@
 var util = require("util");
 require("colors");
 
+// TODO consider piping isTTY through querystring to disable colors if phantom
+// results are piped on the Node.js side.
+
+var colors = (
+    typeof window !== "undefined" || // PhantomJS
+    typeof process !== "undefined" && // Node.js attached to terminal
+    typeof process.stdout !== "undefined" &&
+    process.stdout.isTTY
+);
+
 function getStackTrace() {
     var stack = new Error("").stack;
     if (typeof stack === "string") {
@@ -15,6 +25,7 @@ module.exports = Reporter;
 function Reporter(options) {
     options = options || {};
     this.showFails = !!options.showFails;
+    this.showPasses = !!options.showPasses;
     this.root = this;
     this.passed = 0;
     this.failed = 0;
@@ -33,9 +44,14 @@ Reporter.prototype.start = function (test) {
     child.skipped = false;
     var message = (Array(child.depth + 1).join("❯") + " " + test.type + " " + test.name + (test.async ? " async".white : ""));
     if (test.skip) {
-        message = (message + " (skipped)").cyan;
+        message = message + " (skipped)";
+        if (colors) {
+            message = message.cyan;
+        }
     } else {
-        message = message.grey;
+        if (colors) {
+            message = message.grey;
+        }
     }
     child.message = message;
     if (!this.showFails) {
@@ -67,16 +83,32 @@ Reporter.prototype.skip = function (test) {
     this.root.skipped++;
 };
 
-Reporter.prototype.assert = function (guard, messages, objects) {
-    if (!guard) {
+Reporter.prototype.assert = function (guard, isNot, messages, objects) {
+    var passed = !guard === isNot;
+    if (!passed || this.showPasses) {
         for (var index = 0; index < Math.max(messages.length, objects.length); index++) {
             if (index < messages.length) {
-                console.log(("" + messages[index]).red);
+                var message = "" + messages[index];
+                if (isNot) {
+                    message = message.replace(/\[not\] /, "not ");
+                } else {
+                    message = message.replace(/\[not\] /, "");
+                }
+                if (colors) {
+                    if (passed) {
+                        message = message.green;
+                    } else {
+                        message = message.red;
+                    }
+                }
+                console.log(message);
             }
             if (index < objects.length) {
-                console.log(util.inspect(objects[index], {colors: true, depth: null}));
+                console.log(util.inspect(objects[index], {colors: colors, depth: null}));
             }
         }
+    }
+    if (!passed) {
         var stack = getStackTrace();
         if (stack) {
             console.log(stack);
@@ -108,34 +140,36 @@ Reporter.prototype.enter = function () {
 };
 
 Reporter.prototype.summarize = function (suite) {
-    if (!this.failed && this.passed) {
+    if (colors && !this.failed && this.passed) {
         console.log((this.passed + " passed tests").green);
     } else {
         console.log(this.passed + " passed tests");
     }
-    if (!this.failedAssertions && this.passedAssertions && !this.failed && this.passed) {
+    if (colors && !this.failedAssertions && this.passedAssertions && !this.failed && this.passed) {
         console.log((this.passedAssertions + " passed assertions").green);
     } else {
         console.log(this.passedAssertions + " passed assertions");
     }
-    if (this.failed) {
+    if (colors && this.failed) {
         console.log((this.failed + " failed tests").red);
     } else {
         console.log(this.failed + " failed tests");
     }
-    if (this.failedAssertions) {
+    if (colors && this.failedAssertions) {
         console.log((this.failedAssertions + " failed assertions").red);
     } else {
         console.log(this.failedAssertions + " failed assertions");
     }
-    if (this.errors) {
+    if (colors && this.errors) {
         console.log((this.errors + " errors").red);
     } else {
         console.log(this.errors + " errors");
     }
     var skipped = suite.testCount - this.passed - this.failed;
-    if (skipped) {
+    if (colors && skipped) {
         console.log((skipped + " skipped tests").cyan);
+    } else if (skipped) {
+        console.log(skipped + " skipped tests");
     }
 };
 
