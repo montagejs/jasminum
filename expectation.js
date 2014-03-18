@@ -42,6 +42,7 @@ Expectation.prototype.toEqual = Expectation.binaryMethod(equals, "to equal");
 Expectation.prototype.toBe = Expectation.binaryMethod(Object.is, "to be");
 
 Expectation.prototype.toNotBe = function (value) {
+    console.warn(new Error("toNotBe is deprecated. Use not.toBe").stack);
     return this.not.toBe(value);
 };
 
