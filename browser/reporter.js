@@ -44,16 +44,23 @@ Reporter.prototype.skip = function () {
     this.root.skipped++;
 };
 
-Reporter.prototype.assert = function (guard, messages, objects) {
-    if (guard) {
+Reporter.prototype.assert = function (guard, isNot, messages, objects) {
+    var passed = !guard === isNot;
+    if (passed) {
         this.root.passedAssertions++;
     } else {
         var interleaved = [];
         var format = [];
         for (var index = 0; index < Math.max(messages.length, objects.length); index++) {
             if (index < messages.length) {
+                var message = "" + messages[index];
+                if (isNot) {
+                    message = message.replace(/\[not\] /, "not ");
+                } else {
+                    message = message.replace(/\[not\] /, "");
+                }
                 format.push("%s");
-                interleaved.push(messages[index]);
+                interleaved.push(message);
             }
             if (index < objects.length) {
                 format.push("%O");

@@ -274,16 +274,35 @@ removed in a future release.
 
 Jasminum compensates for its minimalism with extensibility.
 
+By way of background, the DSL provides a few extra methods. `getCurrentSuite`
+returns the suite instance for the containing `describe` block, both at
+declaration time and at test time. `getCurrentTest` returns the current test
+instances at test time, and `getCurrentReport` returns the current report at
+test time. There is no current test or report at declaration time.
+
+Jasminum also supports corresponding `set` methods, but these are intended only
+for the use of the test runner.
+
 ### Expectations
 
 Jasminum expectations can be extended in a variety of ways.
+
+The current suite will always have an `Expectation` property, that the suite
+will use to construct expectation instances when the test calls `expect`. Each
+nested suite, in a `describe` block, will have a prototypically inherited child
+of the parent `Expectation` constructor to isolate any extensions to the
+expectation.
 
 The simplest is to provide overrides for existing expectation methods. Any
 object can implement `equals` or `compare`, which will affect the behavior of
 `toEqual`, `toBeLessThan`, `toBeGreaterThan`, `toBeNear` and `toBeCloseTo`.
 Look into [Montage Collections][] for details about these generic methods.
 
-You can create custom expectation constructors.
+You can create custom expectation constructors. The Jasminum `Expecatation`
+constructor provides an `assert` method that makes most expectations
+implementable with a single call to this utility method. It handles the case
+where the expectation has been negated and gives the reporter great flexibility
+in rendering the involved objects and negating the messages.
 
 ```js
 function FunnyExpectation(value, report) {
@@ -296,15 +315,8 @@ FunnyExpectation.prototype.constructor = FunnyExpectation;
 
 FunnyExpectation.prototype.toBeFunny = function () {
     var isFunny = this.value.isFunny();
-    if (isFunny === !this.isNot) {
-        this.report.failAssertion({
-            message:
-                "expected " + this.value +
-                (this.isNot ? " not " : "") +
-                " to be funny"
-        });
-    }
-}
+    this.assert(isFunny, ["expected", "[not] to be funny"], [this.value]);
+};
 ```
 
 Any value can implement `expect(report)` and return a custom expectation for
@@ -343,7 +355,52 @@ describe("funny objects", function () {
 });
 ```
 
-### Suite, Test, Expectation, and Reporter
+### Reporter
+
+Jasminum provides a console reporter that is suitable for tests run by Node.js,
+or tests run through PhantomJS and forwarded to the Node.js console. It also
+provides a reporter suitable for running tests in an arbitrary browser,
+reporting results to the browser console.
+
+However, tests can be run with an arbitrary reporter. The Suite `runAndReport`
+and `runAndReportSync` methods both accept an `options` object which may include
+either a `report` or `Reporter` constructor. If neither are provided, it falls
+back to calling the `Reporter` on its prototype chain, so Suites can be extended
+to have an alternate default reporter. The Suite shares the run-and-report
+`options` with the reporter constructor.
+
+The Reporter must implement:
+
+-   `start(test) -> reporter`: returns a nested reporter instance for the given
+    test.
+-   `end(test)`: concludes a test. This is a good point to check whether any
+    assertions have failed and to calculate and propagate the test’s statistics.
+-   `skip(test)`: notes that the test has been skipped. `end` will still be
+    called.
+-   `error(error, test)`: notes that an error was thrown while running the test,
+    albeit in a promise handler. `end` will still be called.
+-   `assert(guard, isNot, messages, objects)`: reports on an assertion.
+
+The guard may be a truthy or falsy value, but will be either exactly `true` or
+`false`. `isNot` indicates that the assertion is negative, so the `guard` has
+the opposite meaning, and if any of the `messages` contain the phrase `"
+[not]"`, these must be replaced with `" not"`. Otherwise, these phrases must be
+replaced with an empty string. The objects are intended to be interleaved after
+the corresponding message and there may be more messages than objects, or more
+objects than messages.
+
+The Reporter *may* implement:
+
+-   `enter()`
+-   `exit(exiting)`
+
+The suite runner will call `enter` once before running tests, and `exit` once
+after running all tests. If the tests are exiting prematurely, the `exiting`
+flag will be true, in which case, it would be innapropriate to call
+`process.exit` because doing so would prevent Node.js from printing an uncaught
+exception to the console.
+
+### Suite, Test
 
 The `Suite` constructor can be extended. The `Suite` is not hard-coded to use
 the basic `Test`, `Expectation`, and `Reporter` constructors. Specialized
@@ -352,14 +409,4 @@ expectations and tests can be overridden on the `Suite.prototype`.
 Jasminum provides a `reporter` module with an alternate `browser-reporter`
 implementation that will be used in place of `reporter` automatically if it is
 loaded by Browserify, Mr, or Mop.
-
-The default reporter is only used with the `suite.runAndReport()` method.
-Alternatives can be used with `suite.run(reporter)` directly.
-
-At time of writing, the interface of `Reporter` is in flux, but you can target
-the current interface by replicating the API of either of the existing
-implementations. Jasminum will likely include a [Phantom][] reporter in due
-time.
-
-[Phantom]: http://phantomjs.org/
 

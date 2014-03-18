@@ -11,15 +11,18 @@ function Expectation(value, report) {
     this.not.not = this;
 }
 
+Expectation.prototype.assert = function (guard, messages, objects) {
+    return this.report.assert(guard, this.isNot, messages, objects);
+};
+
 Expectation.binaryMethod = expectationBinaryMethod;
 function expectationBinaryMethod(operator, operatorName) {
     return function (value) {
-        var guard = operator.call(this, this.value, value);
-        this.report.assert(
-            !guard === this.isNot,
+        this.assert(
+            operator.call(this, this.value, value),
             [
                 "expected",
-                (this.isNot ? "not " : "") + operatorName
+                "[not] " + operatorName
             ],
             [
                 this.value,
@@ -84,12 +87,11 @@ function near(a, b, epsilon) {
 }
 
 Expectation.prototype.toBeNear = function (value, epsilon) {
-    var guard = close(this.value, value, precision);
-    this.report.assert(
-        !guard === this.isNot,
+    this.assert(
+        close(this.value, value, precision),
         [
             "expected",
-            (this.isNot ? "not " : "") + " to be near",
+            "[not] to be near",
             "within",
             "above or below"
         ],
@@ -106,12 +108,11 @@ function close(a, b, precision) {
 }
 
 Expectation.prototype.toBeCloseTo = function (value, precision) {
-    var guard = close(this.value, value, precision);
-    this.report.assert(
-        !guard === this.isNot,
+    this.assert(
+        close(this.value, value, precision),
         [
             "expected",
-            (this.isNot ? "not " : "") + "to be close to",
+            "[not] to be close to",
             "within",
             "digits of precision"
         ],
@@ -124,12 +125,12 @@ Expectation.prototype.toBeCloseTo = function (value, precision) {
 };
 
 Expectation.prototype.toBeBetween = function (low, high) {
-    var guard = Object.compare(low, this.value) > 0 && Object.compare(high, this.value) < 0;
-    this.report.assert(
-        !guard === this.isNot,
+    this.assert(
+        Object.compare(low, this.value) > 0 &&
+        Object.compare(high, this.value) < 0,
         [
             "expected",
-            (this.isNot ? "not " : "") + " to be between",
+            "[not] to be between",
             "and"
         ],
         [
@@ -140,13 +141,13 @@ Expectation.prototype.toBeBetween = function (low, high) {
     );
 };
 
-Expectation.prototype.toBeInRange = function (low, high) {
-    var guard = Object.compare(low, this.value) >= 0 && Object.compare(high, this.value) < 0;
-    this.report.assert(
-        !guard === this.isNot,
+Expectation.prototype.toBeInInterval = function (low, high) {
+    this.assert(
+        Object.compare(low, this.value) >= 0 &&
+        Object.compare(high, this.value) < 0,
         [
             "expected",
-            (this.isNot ? "not " : "") + " to be within the interval",
+            "[not] to be within the interval",
             "inclusive to",
             "exclusive"
         ],
@@ -168,26 +169,19 @@ function match(a, b) {
 Expectation.prototype.toMatch = Expectation.binaryMethod(match, "to match");
 
 Expectation.prototype.toThrow = function () {
-    if (this.isNot) {
-        try {
-            this.value();
-            this.report.assert(true, [
-                "expected function not to throw"
-            ], []);
-        } catch (error) {
-            this.report.assert(false, [
+    try {
+        this.value();
+        this.assert(false, [
+            "expected function [not] to throw",
+        ], []);
+    } catch (error) {
+        if (this.isNot) {
+            this.assert(true, [
                 "expected function not to throw but threw"
             ], [error]);
-        }
-    } else {
-        try {
-            this.value();
-            this.report.assert(false, [
-               "expected function to throw"
-            ], []);
-        } catch (error) {
-            this.report.assert(true, [
-               "expected function to throw"
+        } else {
+            this.assert(true, [
+                "expected function to throw"
             ], []);
         }
     }
