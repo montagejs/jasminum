@@ -106,7 +106,11 @@ spyOn = function (object, name) {
 // For internal linkage
 
 getCurrentSuite = function () {
-    return currentSuite;
+    if (currentSuite) {
+        return currentSuite;
+    } else if (currentTest) {
+        return currentTest.suite;
+    }
 };
 
 setCurrentSuite = function (suite) {
@@ -122,7 +126,7 @@ setCurrentReport = function (report) {
 };
 
 getCurrentTest = function () {
-    return currentTest
+    return currentTest;
 };
 
 setCurrentTest = function (test) {
