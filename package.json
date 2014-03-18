@@ -31,7 +31,6 @@
     "util": "^0.10.3"
   },
   "scripts": {
-    "test": "node runner.js test/jasmine-test.js",
-    "test:phantom": "node phantom/runner.js test/jasmine-test.js"
+    "test": "node runner.js test && node phantom/runner.js test"
   }
 }
