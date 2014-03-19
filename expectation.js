@@ -89,7 +89,7 @@ function near(a, b, epsilon) {
 
 Expectation.prototype.toBeNear = function (value, epsilon) {
     this.assert(
-        close(this.value, value, precision),
+        near(this.value, value, epsilon),
         [
             "expected",
             "[not] to be near",
