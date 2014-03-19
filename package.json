@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "q": "^1.0.0",
-    "collections": "^1.0.1",
+    "q-io": "^1.11.0",
+    "collections": "^1.0.2",
     "glob": "^3.2.8",
     "colors": "^0.6.2",
     "optimist": "^0.6.1",
