@@ -83,7 +83,7 @@ function near(a, b, epsilon) {
     if (difference === 0) {
         return Object.equals(a, b);
     } else {
-        return difference < epsilon;
+        return difference <= epsilon;
     }
 }
 
@@ -127,25 +127,8 @@ Expectation.prototype.toBeCloseTo = function (value, precision) {
 
 Expectation.prototype.toBeBetween = function (low, high) {
     this.assert(
-        Object.compare(low, this.value) > 0 &&
-        Object.compare(high, this.value) < 0,
-        [
-            "expected",
-            "[not] to be between",
-            "and"
-        ],
-        [
-            this.value,
-            low,
-            high
-        ]
-    );
-};
-
-Expectation.prototype.toBeInInterval = function (low, high) {
-    this.assert(
-        Object.compare(low, this.value) >= 0 &&
-        Object.compare(high, this.value) < 0,
+        Object.compare(low, this.value) <= 0 &&
+        Object.compare(high, this.value) > 0,
         [
             "expected",
             "[not] to be within the interval",
