@@ -40,7 +40,8 @@ search(argv._).then(function (files) {
                 "http://localhost:" + port + "/~/phantom/index.html?" + QS.stringify({
                     modules: modules,
                     failures: argv.f || argv.failures ? "show" : "hide",
-                    passes: argv.p || argv.passes ? "show" : "hide"
+                    passes: argv.p || argv.passes ? "show" : "hide",
+                    tty: process.stdout.isTTY ? "yes" : "no"
                 })
             ], {
                 stdio: [

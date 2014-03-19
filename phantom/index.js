@@ -4,11 +4,12 @@ var Require = require("mr");
 var URL = require("url");
 var QS = require("qs");
 
-var Suite = require("../jasminum");
-var Reporter = require("../reporter");
-
 var location = URL.resolve(window.location, "/");
 var query = QS.parse(window.location.search.slice(1));
+window.isTTY = query.tty === "yes";
+
+var Suite = require("../jasminum");
+var Reporter = require("../reporter");
 
 Require.loadPackage(location, {
     overlays: ["browser"]

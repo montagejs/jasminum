@@ -6,7 +6,8 @@ require("colors");
 // results are piped on the Node.js side.
 
 var colors = (
-    typeof window !== "undefined" || // PhantomJS
+    typeof window !== "undefined" &&
+    window.isTTY || // PhantomJS
     typeof process !== "undefined" && // Node.js attached to terminal
     typeof process.stdout !== "undefined" &&
     process.stdout.isTTY
