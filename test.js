@@ -34,7 +34,7 @@ Test.prototype.run = function (report, Promise) {
         }
     })
     .then(function (value) {
-        // TODO expect return value to be undefined
+        report.assert(value === undefined, false, ["expected test to return or resolve undefined but got"], [value]);
     }, function (error) {
         report.error(error, self);
     })
