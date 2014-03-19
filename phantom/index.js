@@ -25,7 +25,9 @@ Require.loadPackage(location, {
             });
         });
         return suite.runAndReport({
-            report: new Reporter()
+            Reporter: Reporter,
+            showFails: query.failures === "show",
+            showPasses: query.passes === "show"
         });
     });
 })

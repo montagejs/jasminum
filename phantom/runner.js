@@ -9,7 +9,10 @@ var Require = require("mr");
 var optimist = require("optimist");
 var search = require("../search");
 
-var argv = optimist.argv;
+var argv = optimist
+    .boolean(["p", "passes"])
+    .boolean(["f", "failures"])
+    .argv;
 
 search(argv._).then(function (files) {
     return Require.findPackageLocationAndModuleId(files[0])
@@ -35,7 +38,9 @@ search(argv._).then(function (files) {
             var child = ChildProcess.spawn("phantomjs", [
                 Fs.join(__dirname, "script.js"),
                 "http://localhost:" + port + "/~/phantom/index.html?" + QS.stringify({
-                    modules: modules
+                    modules: modules,
+                    failures: argv.f || argv.failures ? "show" : "hide",
+                    passes: argv.p || argv.passes ? "show" : "hide"
                 })
             ], {
                 stdio: [
