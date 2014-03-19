@@ -51,7 +51,7 @@ Test.prototype.beforeEach = function (Promise, context, report) {
     return heritage.reduceRight(function (ready, suite) {
         return ready.then(function () {
             if (suite.beforeEach) {
-                return self.call(suite.beforeEach, context, report, "before");
+                return self.call(suite.beforeEach, Promise, context, report, "before");
             }
         });
     }, Promise.resolve());
@@ -63,7 +63,7 @@ Test.prototype.afterEach = function (Promise, context, report) {
     return heritage.reduceRight(function (ready, suite) {
         return ready.then(function () {
             if (suite.afterEach) {
-                return self.call(suite.afterEach, context, report, "after");
+                return self.call(suite.afterEach, Promise, context, report, "after");
             }
         });
     }, Promise.resolve());
