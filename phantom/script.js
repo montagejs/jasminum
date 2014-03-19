@@ -25,7 +25,6 @@ page.onError = function (message, trace) {
 
 page.onResourceError = function (resourceError) {
     console.log("Resource error: " + resourceError.url);
-    phantom.exit(-1);
 };
 
 page.open(system.args[1], function (status) {
