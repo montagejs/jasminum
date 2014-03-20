@@ -1,6 +1,6 @@
 {
   "name": "jasminum",
-  "version": "0.0.2",
+  "version": "2.0.0",
   "description": "A light, modular, promissory, isomorphic Jasmine test scaffold clone",
   "keywords": [
     "jasmine",
@@ -19,14 +19,14 @@
     "platform-reporter": "browser/reporter"
   },
   "dependencies": {
-    "q": "^1.0.0",
-    "collections": "^1.0.1",
+    "q": "^2.0.0",
+    "collections": "^2.0.0",
+    "mr": "^2.0.0",
+    "joey": "^2.0.0",
     "glob": "^3.2.8",
     "colors": "^0.6.2",
     "optimist": "^0.6.1",
     "qs": "^0.6.6",
-    "mr": "^0.15.4",
-    "joey": "^1.5.1",
     "url": "^0.7.9",
     "util": "^0.10.3"
   },
