@@ -8,6 +8,9 @@ function Test(name, callback, suite) {
     this.children = [];
     this.suite = suite;
     this.skip = !callback;
+    // The [should fail] directive in a test name exists solely for the purpose
+    // of testing the test runner itself.
+    this.shouldFail = /\[should fail\]/.test(name);
 }
 
 Test.prototype.type = "it";

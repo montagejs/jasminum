@@ -153,6 +153,12 @@ function match(a, b) {
 Expectation.prototype.toMatch = Expectation.binaryMethod(match, "to match");
 
 Expectation.prototype.toThrow = function () {
+    if (typeof this.value !== "function") {
+        this.report.assert(false, false, [
+            "expected function but got"
+        ], [this.value]);
+        return;
+    }
     try {
         this.value();
         this.assert(false, [
