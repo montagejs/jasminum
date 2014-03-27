@@ -325,6 +325,10 @@ describe("expectations", function () {
                 throw new Error("X");
             }).toThrow();
         });
+
+        it("[should fail] checks whether the value is a function", function () {
+            expect(undefined).not.toThrow();
+        });
     });
 
     describe("not.toThrow", function () {
@@ -507,11 +511,11 @@ describe("asynchronous tests", function () {
         expect(completed).toBe(true);
     });
 
-    xit("[should fail] expects the resolution of a promse to be undefined", function () {
+    it("[should fail] expects the resolution of a promse to be undefined", function () {
         return Q(10);
     });
 
-    xit("[should fail] expects the promise ot be fulfilled", function () {
+    it("[should fail] expects the promise ot be fulfilled", function () {
         return Q().then(function () {
             throw new Error("Should fail");
         });

@@ -23,7 +23,7 @@ function getStackTrace() {
 }
 
 function annotateStackTrace(stack) {
-    if (colors) {
+    if (stack && colors) {
         stack = stack.replace(/\n    ([^\n]+\-(?:spec|test)\.js[^\n]+)/g, function ($0, $1) {
             return ("\n  → " + $1).bold;
         });
@@ -48,9 +48,14 @@ function Reporter(options) {
 
 Reporter.prototype.start = function (test) {
     var child = Object.create(this);
+    child.test = test;
     child.parent = this;
     child.depth = this.depth + 1;
-    child.failed = false;
+    // A test passes if all assertions pass.
+    // A test that should fail passes if any assertion fails.
+    // Tests that [should fail] exist only for validating the test runner
+    // itself and is only necessarily implemented by this test reporter.
+    child.failed = test.shouldFail;
     child.skipped = false;
     var message = (Array(child.depth + 1).join("❯") + " " + test.type + " " + test.name + (test.async ? " async".white : ""));
     if (test.skip) {
@@ -95,7 +100,7 @@ Reporter.prototype.skip = function (test) {
 
 Reporter.prototype.assert = function (guard, isNot, messages, objects) {
     var passed = !guard === isNot;
-    if (!passed || this.showPasses) {
+    if ((!passed && !this.test.shouldFail) || this.showPasses) {
         for (var index = 0; index < Math.max(messages.length, objects.length); index++) {
             if (index < messages.length) {
                 var message = "" + messages[index];
@@ -105,7 +110,7 @@ Reporter.prototype.assert = function (guard, isNot, messages, objects) {
                     message = message.replace(/\[not\] /, "");
                 }
                 if (colors) {
-                    if (passed) {
+                    if (passed !== this.test.shouldFail) {
                         message = message.green;
                     } else {
                         message = message.red;
@@ -118,23 +123,42 @@ Reporter.prototype.assert = function (guard, isNot, messages, objects) {
             }
         }
     }
-    if (!passed) {
+    if (!passed && !this.test.shouldFail) {
         var stack = annotateStackTrace(getStackTrace());
         if (stack) {
             console.log(stack);
         }
-        this.failed = true;
-        this.root.failedAssertions++;
-    } else {
-        this.root.passedAssertions++;
+    }
+    if (passed) { // passed
+        if (this.test.shouldFail) { // but should fail
+            this.failed = false;
+        } else { // and passed
+            this.root.passedAssertions++;
+        }
+    } else { // failed
+        if (!this.test.shouldFail) { // but should pass
+            this.failed = true;
+            this.root.failedAssertions++;
+        } else { // and should fail
+            this.failed = false;
+            this.root.passedAssertions++;
+        }
     }
 };
 
 Reporter.prototype.error = function (error, test) {
-    this.failed = true;
-    this.root.errors++;
-    console.log(colors ? "error".red : "error");
-    console.error(error && error.stack ? annotateStackTrace(error.stack) : error);
+    if (this.test.shouldFail) {
+        this.failed = false;
+    } else {
+        console.log(colors ? "error".red : "error");
+        if (typeof error.stack === "string") {
+            console.log(annotateStackTrace(error.stack));
+        } else if (error) {
+            console.log(error);
+        }
+        this.failed = true;
+        this.root.errors++;
+    }
 };
 
 Reporter.prototype.enter = function () {
