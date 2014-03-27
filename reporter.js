@@ -123,9 +123,9 @@ Reporter.prototype.assert = function (guard, isNot, messages, objects) {
         }
     }
     if (!passed && !this.test.shouldFail) {
-        var stack = annotateStackTrace(getStackTrace());
+        var stack = getStackTrace();
         if (stack) {
-            console.log(stack);
+            console.log(annotateStackTrace(stack));
         }
     }
     if (passed) { // passed
