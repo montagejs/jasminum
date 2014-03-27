@@ -11,6 +11,8 @@ var argv = optimist
     .boolean(["f", "failures"])
     .argv;
 
+Error.stackTraceLimit = Infinity;
+
 search(argv._).then(function (files) {
 
     var suite = new Suite("").describe(function () {
