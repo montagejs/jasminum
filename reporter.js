@@ -16,10 +16,19 @@ var colors = (
 function getStackTrace() {
     var stack = new Error("").stack;
     if (typeof stack === "string") {
-        return stack.replace(/^[^\n]*\n[^\n]\n/, "");
-    } else {
-        return stack;
+        stack = stack.replace(/^[^\n]*\n[^\n]\n/, "");
+        stack = annotateStackTrace(stack);
     }
+    return stack;
+}
+
+function annotateStackTrace(stack) {
+    if (colors) {
+        stack = stack.replace(/\n    ([^\n]+\-(?:spec|test)\.js[^\n]+)/g, function ($0, $1) {
+            return ("\n  → " + $1).bold;
+        });
+    }
+    return stack;
 }
 
 module.exports = Reporter;
@@ -63,7 +72,7 @@ Reporter.prototype.start = function (test) {
 
 Reporter.prototype.end = function (test) {
     if (this.showFails && this.failed) {
-        console.log((Array(this.depth + 1).join("⬆") + " " + test.type + " " + test.name).grey);
+        console.log((Array(this.depth + 1).join("↑") + " " + test.type + " " + test.name).grey);
     }
     if (this.failed && this.parent && this.parent.parent) {
         this.parent.failed = true;
@@ -110,7 +119,7 @@ Reporter.prototype.assert = function (guard, isNot, messages, objects) {
         }
     }
     if (!passed) {
-        var stack = getStackTrace();
+        var stack = annotateStackTrace(getStackTrace());
         if (stack) {
             console.log(stack);
         }
@@ -124,8 +133,8 @@ Reporter.prototype.assert = function (guard, isNot, messages, objects) {
 Reporter.prototype.error = function (error, test) {
     this.failed = true;
     this.root.errors++;
-    console.log("error".red);
-    console.error(error && error.stack ? error.stack : error);
+    console.log(colors ? "error".red : "error");
+    console.error(error && error.stack ? annotateStackTrace(error.stack) : error);
 };
 
 Reporter.prototype.enter = function () {
@@ -133,7 +142,11 @@ Reporter.prototype.enter = function () {
         var self = this;
         this.exitListener = function (code) {
             self.failed++;
-            console.log("test never completes: add a timeout".red);
+            if (colors) {
+                console.log("test never completes".red);
+            } else {
+                console.log("test never completes");
+            }
             self.exit(code !== 0);
         };
         process.on("exit", this.exitListener);
