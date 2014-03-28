@@ -17,6 +17,16 @@ including [Browserify][], [Mr][], or [Mop][].
 [Mr]: https://github.com/montagejs/mr
 [Mop]: https://github.com/montagejs/mop
 
+Jasminum is built for debugging and isolation, not merely a regression
+trip-wire. Instead of trying to patch the universe so that all context gets
+funneled into pretty reports, Jasminum reports to the console. You do not need
+to isolate which test was running when that message got dumped to the console.
+Jasminum includes reporters for Node.js, PhantomJS, and browser based tests. The
+reporter only highlights lines of interest. It highlights the spec in stack
+traces. The test summary only shows green if all tests pass. The test summary
+only shows red if any tests fail. The test summary only highlights skipped tests
+if there were any.
+
 First, write a test.
 
 ```js
@@ -28,7 +38,15 @@ describe("my library", function () {
 });
 ```
 
-You can install the `jasminum` command using `npm`.
+You can install the `jasminum` command using `npm`. I recommend installing
+Jasminum in your project so the version gets saved in your `package.json` and so
+you can use different versions in your various projects.
+
+```
+❯ npm install jasminum --save-dev
+```
+
+Or, if necessary, install globally.
 
 ```
 ❯ [sudo] npm install jasminum -g
@@ -176,6 +194,12 @@ promise library.
 
 [Montage Collections]: https://github.com/montagejs/collections
 [Q]: https://github.com/kriskowal/q
+
+Jasminum is loosely coupled to Q. You can substitute any promise library that
+supports a `Promise` constructor and a `Promise.resolve` method, per
+ECMAScript 6. Create a constructor that inherits from Jasminum’s `Suite` and
+override its `Promise` property, or just pass `Promise` as an option to
+`suite.runAndReport(options)`.
 
 The Collections library establishes foundations that Jasminum employs for
 comparing values, particularly polymorphic `Object.equals`, `Object.compare`,
