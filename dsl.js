@@ -89,11 +89,12 @@ expect = function (value) {
         throw new Error("Cannot declare an expectation outside of an 'it' block");
     }
     if (value && typeof value.expect === "function") {
-        return value.expect(currentReport);
+        return value.expect(currentReport, currentTest);
     } else {
         return new currentTest.suite.Expectation(
             value,
-            currentReport
+            currentReport,
+            currentTest
         );
     }
 };

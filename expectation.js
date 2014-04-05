@@ -2,9 +2,10 @@
 require("collections/shim");
 
 module.exports = Expectation;
-function Expectation(value, report) {
+function Expectation(value, report, test) {
     this.value = value;
     this.report = report;
+    this.test = test;
     this.isNot = false;
     this.not = Object.create(this);
     this.not.isNot = true;

@@ -329,8 +329,8 @@ where the expectation has been negated and gives the reporter great flexibility
 in rendering the involved objects and negating the messages.
 
 ```js
-function FunnyExpectation(value, report) {
-    Expectation.call(this, value, report);
+function FunnyExpectation(value, report, test) {
+    Expectation.call(this, value, report, test);
     // Also sets up the .not.isNot = true, .not.not = this stuff
 };
 
