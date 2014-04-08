@@ -36,6 +36,7 @@ function deploy() {
         }).then(function () {
             return {
                 type: reference.type,
+                path: reference.path,
                 tags: [reference.type],
                 build: reference.build,
                 custom: reference,
