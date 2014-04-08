@@ -39,7 +39,8 @@
   },
   "scripts": {
     "test": "node runner.js test",
-    "test:sauce": "source activate.sh; node test/sauce.js"
+    "test:sauce": ". activate.sh; node test/sauce.js",
+    "deploy": ". activate.sh; node test/deploy.js"
   },
   "sauce": {
     "configurations": [
@@ -61,26 +62,6 @@
         "version": "4.3",
         "device-orientation": "portrait",
         "device-type": "tablet"
-      },
-      {
-        "browserName": "internet explorer",
-        "version": 6,
-        "platform": "Windows XP"
-      },
-      {
-        "browserName": "internet explorer",
-        "version": 7,
-        "platform": "Windows XP"
-      },
-      {
-        "browserName": "internet explorer",
-        "version": 8,
-        "platform": "Windows XP"
-      },
-      {
-        "browserName": "internet explorer",
-        "version": 9,
-        "platform": "Windows 7"
       },
       {
         "browserName": "internet explorer",
