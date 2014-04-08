@@ -61,7 +61,7 @@ function put(s3, path, content, headers) {
 }
 
 function getDeploymentReference() {
-    return getGitHash("head").then(function (hash) {
+    return getGitHash("HEAD").then(function (hash) {
         return gitIsClean().then(function (gitIsClean) {
             if (gitIsClean) {
                 return getGitHash("v" + config.version).then(function (vHash) {

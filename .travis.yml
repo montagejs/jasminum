@@ -1,7 +1,7 @@
 language: node_js
 node_js:
 - '0.10'
-script: git --version; git rev-parse head; npm test && node test/sauce.js
+script: npm test && node test/sauce.js
 env:
   global:
   - secure: G8YIZd+5DE0V77lgipwvIdPNNSN3ibgW+/uQB25+M3bj9TsuEDjIY3ng8dFr7NsJHOja0HVuc033uw/06N1UMSKw9PTvrBcagMsBxas9sY0NlUvxfcgqx5KWfB5IT0CJEMTJg7FWHGnhPjTY7yKLnSrXq4OPQQJoMGbwtRGg358=

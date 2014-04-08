@@ -31,12 +31,12 @@ var s3 = knox.createClient({
 
 return deploy()
 .then(function (parameters) {
-    return configuration.configurations.reduce(function (previous, configuration) {
-        return previous.then(function () {
-            return runConfiguration(configuration, parameters);
+    return configuration.configurations.reduce(function (failed, configuration) {
+        return failed.then(function (failed) {
+            return runConfiguration(configuration, parameters, failed);
         });
-    }, Q())
-    .then(function () {
+    }, Q(false))
+    .then(function (failed) {
         // Capture a snapshot of the test matrix and upload it to the appropriate container
         return HTTP.request("https://saucelabs.com/browser-matrix/kriskowal-jasminum.svg")
         .get("body").invoke("read")
@@ -56,9 +56,12 @@ return deploy()
             });
         })
     });
+    if (failed) {
+        process.exit(-1);
+    }
 }).done();
 
-function runConfiguration(configuration, parameters) {
+function runConfiguration(configuration, parameters, failed) {
     var browser = webdriver.promiseRemote(
         "ondemand.saucelabs.com",
         80,
@@ -106,6 +109,7 @@ function runConfiguration(configuration, parameters) {
                 public: true
             });
         }, function (error) {
+            failed = true;
             return sauce.ninvoke("updateJob", sessionId, {
                 passed: false,
                 public: true,
@@ -117,6 +121,9 @@ function runConfiguration(configuration, parameters) {
     })
     .finally(function () {
         return browser.quit();
+    })
+    .then(function () {
+        return failed;
     });
 }
 
