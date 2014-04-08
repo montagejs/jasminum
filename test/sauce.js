@@ -10,6 +10,7 @@ var SauceLabs = require("saucelabs");
 var URL = require("url");
 var knox = require("knox");
 var deploy = require("./deploy");
+var HTTP = require("q-io/http");
 
 var sauce = Q(new SauceLabs({
     username: process.env.SAUCE_USERNAME,
@@ -36,6 +37,7 @@ return deploy()
         });
     }, Q())
     .then(function () {
+        // Capture a snapshot of the test matrix and upload it to the appropriate container
         return HTTP.request("https://saucelabs.com/browser-matrix/kriskowal-jasminum.svg")
         .get("body").invoke("read")
         .then(function (content) {
