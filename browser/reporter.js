@@ -1,4 +1,17 @@
 
+if (!console.group) {
+    console.group = console.log;
+    console.groupEnd = console.log;
+}
+
+if (!console.error) {
+    console.error = console.log;
+}
+
+if (!console.warn) {
+    console.warn = console.log;
+}
+
 var body = document.querySelector("body");
 body.classList.add("testing");
 
@@ -99,5 +112,13 @@ Reporter.prototype.summarize = function (suite) {
     console.log(this.errors + " errors");
     var skipped = suite.testCount - this.passed - this.failed;
     console.log(skipped + " skipped tests");
+
+    window.global_test_results = {
+        passed: this.passed,
+        passedAssertions: this.passedAssertions,
+        failed: this.failed,
+        failedAssertions: this.failedAssertions,
+        skipped: skipped
+    };
 };
 
