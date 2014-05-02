@@ -1,4 +1,3 @@
-
 # Jasminum
 
 [![Release Compatibility Matrix](https://s3-us-west-2.amazonaws.com/jasminum/sauce-development.svg)](https://saucelabs.com/u/kriskowal-jasminum)
@@ -104,17 +103,10 @@ new Suite("my tests").describe(function () {
 }).runAndReport().done();
 ```
 
-Jasminum can be installed with `npm`. Make sure you have a `package.json`; `npm
-init` will walk you through that.
-
-Add Jasminum to your package with `npm install jasminum --save-dev` and create a
-test script so that it will run with `npm test`.
+Create a test script in your `package.json`:
 
 ```json
 {
-    "devDependencies": {
-        "jasminum": "~1.0"
-    },
     "scripts": {
         "test": "node test/index.js"
     }
@@ -262,7 +254,7 @@ standard output and console messages. In the browser, the inspected window is
 left as a stage for the application under test and the test runner will only
 fiddle with the `testing`, `pass`, and `fail` classes of the `body` element.
 
-In addition to `describe` and `it, Jasmine and Jasminum both support `xdescribe`
+In addition to `describe` and `it`, Jasmine and Jasminum both support `xdescribe`
 and `xit` to quickly or temporarily disable a test. In addition, Jasminum
 [supports][iidd] `ddescribe` and `iit` that will cause the test runner to focus
 on the annotated suites or tests.
