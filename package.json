@@ -1,8 +1,8 @@
 {
   "name": "jasminum",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "publishConfig": {
-      "tag": "future"
+    "tag": "future"
   },
   "description": "A light, modular, promissory, isomorphic Jasmine test scaffold clone",
   "keywords": [
