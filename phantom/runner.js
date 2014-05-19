@@ -20,19 +20,35 @@ search(argv._).then(function (files) {
         return Require.loadPackage(found.location);
     })
     .then(function (found) {
-        return found.loadPackage({name: "jasminum"});
-    })
-    .then(function (found) {
         var path = Require.locationToPath(found.location);
         var modules = files.map(function (file) {
             return Fs.relativeFromDirectory(path, file);
         });
-        var jasminumLocation = found.getPackage({name: "jasminum"}).location;
-        var jasminumPath = Require.locationToPath(jasminumLocation);
-        var jasminumRelPath = Fs.relativeFromDirectory(path, jasminumPath);
-        var indexRelPath = Fs.join(jasminumRelPath, "phantom/index.html");
+
+        var mrLocation = found.getPackage({name: "mr"}).location;
+        var mrPath = Require.locationToPath(mrLocation);
+        var mrRelPath = Fs.relativeFromDirectory(path, mrPath);
+        var bootPath = Fs.join("/", mrRelPath, "boot.js");
+
+        var jasminum = found.getPackage({name: "jasminum"});
+        var indexId = found.identify("phantom/index", jasminum);
+
+        var index = [
+            "<!DOCTYPE html>",
+            "<head>",
+            "<meta charset=\"utf-8\">",
+            // TODO protect against HTML injection
+            "<script src=\"" + bootPath + "\" data-module=\"" + indexId + "\"></script>",
+            "</head>",
+            "<body>",
+            "</body>",
+            "</html>"
+        ];
 
         var server = Joey
+        .route(function ($) {
+            $("").method("GET").content(index, "text/html");
+        })
         .fileTree(path, {followInsecureSymbolicLinks: true})
         .server();
 
@@ -42,7 +58,7 @@ search(argv._).then(function (files) {
             var port = server.address().port;
             var child = ChildProcess.spawn("phantomjs", [
                 Fs.join(__dirname, "script.js"),
-                "http://localhost:" + port + "/" + indexRelPath + "?" + QS.stringify({
+                "http://localhost:" + port + "/?" + QS.stringify({
                     modules: modules,
                     failures: argv.f || argv.failures ? "show" : "hide",
                     passes: argv.p || argv.passes ? "show" : "hide",
