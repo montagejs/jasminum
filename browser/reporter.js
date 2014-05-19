@@ -18,13 +18,16 @@ Reporter.prototype.start = function (test) {
     var child = Object.create(this);
     child.test = test;
     child.depth = this.depth + 1;
-    child.failed = false;
+    child.failed = test.shouldFail;
     child.skipped = false;
     console.group(test.type + " " + test.name);
     return child;
 };
 
 Reporter.prototype.end = function (test) {
+    if (this.failed && this.parent && this.parent.parent) {
+        this.parent.failed = true;
+    }
     if (test.type === "it") {
         if (this.failed) {
             this.root.failed++;
@@ -46,9 +49,7 @@ Reporter.prototype.skip = function () {
 
 Reporter.prototype.assert = function (guard, isNot, messages, objects) {
     var passed = !guard === isNot;
-    if (passed) {
-        this.root.passedAssertions++;
-    } else {
+    if ((!passed && !this.test.shouldFail) || this.showPasses) {
         var interleaved = [];
         var format = [];
         for (var index = 0; index < Math.max(messages.length, objects.length); index++) {
@@ -69,15 +70,34 @@ Reporter.prototype.assert = function (guard, isNot, messages, objects) {
         }
         //interleaved.unshift(format.join(" "));
         console.log.apply(console, interleaved);
-        this.failed = true;
-        this.root.failedAssertions++;
+    }
+    if (passed) { // passed
+        if (this.test.shouldFail) { // but should fail
+            this.failed = false;
+        } else { // and passed
+            this.root.passedAssertions++;
+        }
+    } else { // failed
+        if (!this.test.shouldFail) { // but should pass
+            this.failed = true;
+            this.root.failedAssertions++;
+        } else { // and should fail
+            this.failed = false;
+            this.root.passedAssertions++;
+        }
     }
 };
 
 Reporter.prototype.error = function (error, test) {
     this.failed = true;
     this.root.errors++;
-    console.log(error.stack);
+    if (this.test.shouldFail) {
+        this.failed = false;
+    } else if (error && typeof error.stack === "string") {
+        console.log(error.stack);
+    } else {
+        console.log(error);
+    }
 };
 
 Reporter.prototype.summarize = function (suite) {
