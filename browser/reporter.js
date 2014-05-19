@@ -99,5 +99,13 @@ Reporter.prototype.summarize = function (suite) {
     console.log(this.errors + " errors");
     var skipped = suite.testCount - this.passed - this.failed;
     console.log(skipped + " skipped tests");
+
+    global.global_test_results = {
+        passed: this.passed,
+        passedAssertions: this.passedAssertions,
+        failed: this.failed,
+        failedAssertions: this.failedAssertions,
+        skipped: skipped
+    };
 };
 

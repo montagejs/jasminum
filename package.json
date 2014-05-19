@@ -32,9 +32,17 @@
     "optimist": "^0.6.1",
     "qs": "^0.6.6",
     "url": "^0.7.9",
-    "util": "^0.10.3"
+    "util": "^0.10.3",
+    "knox": ">=0.8.9 <0.9.0",
+    "wd": ">=0.2.15 <0.3.0",
+    "saucelabs": ">=0.1.1 <0.2.0"
   },
   "scripts": {
-    "test": "node runner.js test && node phantom/runner.js test"
+    "test": "npm run test:node && npm run test:phantom && npm run lint",
+    "test:node": "node runner.js test",
+    "test:phantom": "node phantom/runner.js test",
+    "deploy": "node scripts/deploy.js",
+    "saucelabs": "node scripts/saucelabs.js",
+    "lint": ""
   }
 }

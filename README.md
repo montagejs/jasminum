@@ -1,6 +1,8 @@
 
 # Jasminum
 
+[![Release Compatibility Matrix](https://s3-us-west-2.amazonaws.com/jasminum/v2/saucelabs-matrix.svg)](https://saucelabs.com/u/kriskowal-jasminum)
+
 > *“Jasmine (taxonomic name Jasminum /ˈdʒæzmɨnəm/) is a genus of shrubs and
 > vines in the olive family (Oleaceae)”*
 > &mdash;&nbsp;[Wikipedia](http://en.wikipedia.org/wiki/Jasmine)
