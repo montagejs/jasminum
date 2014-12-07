@@ -44,5 +44,19 @@
     "deploy": "node scripts/deploy.js",
     "saucelabs": "node scripts/saucelabs.js",
     "lint": ""
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/montagejs/jasminum.git"
+  },
+  "author": "Kris Kowal <kris@cixar.com>",
+  "license": "BSD 3-Clause",
+  "bugs": {
+    "url": "https://github.com/montagejs/jasminum/issues"
+  },
+  "homepage": "https://github.com/montagejs/jasminum"
 }
