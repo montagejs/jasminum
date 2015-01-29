@@ -1,5 +1,6 @@
 
-require("collections/shim");
+var equals = require("pop-equals");
+var compare = require("pop-compare");
 
 module.exports = Expectation;
 function Expectation(value, report) {
@@ -32,9 +33,9 @@ function expectationBinaryMethod(operator, operatorName) {
     };
 }
 
-function equals(left, right) {
+function equalsRight(left, right) {
     // So that right can be an Any object with an equals override
-    return Object.equals(right, left);
+    return equals(right, left);
 }
 
 Expectation.prototype.toEqual = Expectation.binaryMethod(equals, "to equal");
@@ -67,19 +68,19 @@ Expectation.prototype.toBeFalsy = function () {
 Expectation.prototype.toContain = Expectation.binaryMethod(Object.has, "to contain");
 
 function lessThan(a, b) {
-    return Object.compare(a, b) < 0;
+    return compare(a, b) < 0;
 }
 
 Expectation.prototype.toBeLessThan = Expectation.binaryMethod(lessThan, "to be less than");
 
 function greaterThan(a, b) {
-    return Object.compare(a, b) > 0;
+    return compare(a, b) > 0;
 }
 
 Expectation.prototype.toBeGreaterThan = Expectation.binaryMethod(greaterThan, "to be greater than");
 
 function near(a, b, epsilon) {
-    var difference = Math.abs(Object.compare(a, b));
+    var difference = Math.abs(compare(a, b));
     if (difference === 0) {
         return Object.equals(a, b);
     } else {
@@ -127,8 +128,8 @@ Expectation.prototype.toBeCloseTo = function (value, precision) {
 
 Expectation.prototype.toBeBetween = function (low, high) {
     this.assert(
-        Object.compare(low, this.value) <= 0 &&
-        Object.compare(high, this.value) > 0,
+        compare(low, this.value) <= 0 &&
+        compare(high, this.value) > 0,
         [
             "expected",
             "[not] to be within the interval",
