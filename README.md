@@ -203,9 +203,9 @@ ECMAScript 6. Create a constructor that inherits from Jasminum’s `Suite` and
 override its `Promise` property, or just pass `Promise` as an option to
 `suite.runAndReport(options)`.
 
-The Collections library establishes foundations that Jasminum employs for
-comparing values, particularly polymorphic `Object.equals`, `Object.compare`,
-and `Object.has` operators, as well as the non-polymorphic `Object.is` operator.
+Several small libaries establish foundations that Jasminum employs for
+comparing values, particularly polymorphic `pop-equals`, `pop-compare`,
+and `pop-has` operators, as well as the non-polymorphic `is` operator.
 These do not behave exactly the same way as Jasmine, but are designed with
 extensibility in mind both within and beyond testing. Partcularly, “any” objects
 simply override their “equals” method to recognize any object of the same type
