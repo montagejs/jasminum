@@ -1,6 +1,8 @@
 
-var equals = require("pop-equals");
+require("regexp-escape");
 var compare = require("pop-compare");
+var equals = require("pop-equals");
+var has = require("pop-has");
 
 module.exports = Expectation;
 function Expectation(value, report) {
@@ -40,7 +42,7 @@ function equalsRight(left, right) {
 
 Expectation.prototype.toEqual = Expectation.binaryMethod(equals, "to equal");
 
-Expectation.prototype.toBe = Expectation.binaryMethod(Object.is, "to be");
+Expectation.prototype.toBe = Expectation.binaryMethod(is, "to be");
 
 Expectation.prototype.toNotBe = function (value) {
     console.warn(new Error("toNotBe is deprecated. Use not.toBe").stack);
@@ -65,7 +67,7 @@ Expectation.prototype.toBeFalsy = function () {
     return this.not.toBeTruthy();
 };
 
-Expectation.prototype.toContain = Expectation.binaryMethod(Object.has, "to contain");
+Expectation.prototype.toContain = Expectation.binaryMethod(has, "to contain");
 
 function lessThan(a, b) {
     return compare(a, b) < 0;
@@ -82,7 +84,7 @@ Expectation.prototype.toBeGreaterThan = Expectation.binaryMethod(greaterThan, "t
 function near(a, b, epsilon) {
     var difference = Math.abs(compare(a, b));
     if (difference === 0) {
-        return Object.equals(a, b);
+        return equals(a, b);
     } else {
         return difference <= epsilon;
     }
@@ -177,4 +179,8 @@ Expectation.prototype.toThrow = function () {
         }
     }
 };
+
+function is(x, y) {
+    return x === y || (x !== x && y !== y);
+}
 
