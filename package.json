@@ -10,6 +10,7 @@
     "promise",
     "isomorphic"
   ],
+  "license" : "BSD-3-Clause",
   "main": "jasminum.js",
   "bin": {
     "jasminum": "runner.js",
