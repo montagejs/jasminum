@@ -13,7 +13,7 @@ tests, and has an “isomorphic” API, meaning Jasminum tests can be run withou
 modification between Node.js and browsers using CommonJS module loaders
 including [Browserify][], [Mr][], or [Mop][].
 
-[Jasmine 1.3]: http://pivotal.github.io/jasmine/
+[Jasmine 1.3]: https://jasmine.github.io/
 [Browserify]: https://github.com/substack/node-browserify 
 [Mr]: https://github.com/montagejs/mr
 [Mop]: https://github.com/montagejs/mop
@@ -259,7 +259,7 @@ and `xit` to quickly or temporarily disable a test. In addition, Jasminum
 [supports][iidd] `ddescribe` and `iit` that will cause the test runner to focus
 on the annotated suites or tests.
 
-[iidd]: https://github.com/pivotal/jasmine/pull/181
+[iidd]: https://github.com/jasmine/jasmine/pull/181
 
 ## Light
 
