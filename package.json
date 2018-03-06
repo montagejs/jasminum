@@ -22,6 +22,10 @@
   "browser": {
     "./platform-reporter.js": "browser/reporter.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/montagejs/jasminum.git"
+  },
   "dependencies": {
     "colors": "^0.6.2",
     "glob": "^3.2.8",
@@ -34,12 +38,12 @@
     "pop-has": "^1.0.0",
     "q": "^2.0.3",
     "q-io": "^2.0.2",
-    "qs": "^0.6.6",
+    "qs": "^6.5.1",
     "regexp-escape": "0.0.1",
     "saucelabs": ">=0.1.1 <0.2.0",
-    "url": "^0.7.9",
+    "url": ">=0.11",
     "util": "^0.10.3",
-    "wd": ">=0.2.15 <0.3.0"
+    "wd": "^1.6.0"
   },
   "scripts": {
     "test": "npm run test:node && npm run test:phantom && npm run lint",
