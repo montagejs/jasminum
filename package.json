@@ -1,6 +1,9 @@
 {
   "name": "jasminum",
-  "version": "0.0.6",
+  "version": "2.0.6",
+  "publishConfig": {
+    "tag": "future"
+  },
   "description": "A light, modular, promissory, isomorphic Jasmine test scaffold clone",
   "keywords": [
     "jasmine",
@@ -24,105 +27,44 @@
     "url": "https://github.com/montagejs/jasminum.git"
   },
   "dependencies": {
-    "collections": "5.1.2",
-    "colors": ">=0.6.2 <0.7.0",
-    "glob": "^7.1.2",
-    "joey": ">=1.5.3 <2.0.0",
-    "knox": "^0.9.2",
-    "mr": ">=17.0.11 <18.0.0",
-    "optimist": ">=0.6.1 <0.7.0",
-    "q": ">=1.5.1 <2.0.0",
-    "q-io": ">=1.13.5 <2.0.0",
-    "qs": "^6.5.1",
+    "colors": "^0.6.2",
+    "glob": "^3.2.8",
+    "joey": "^2.0.1",
+    "knox": ">=0.8.9 <0.9.0",
+    "mr": "^2.0.3",
+    "optimist": "^0.6.1",
+    "pop-compare": "^1.0.0",
+    "pop-equals": "^1.0.0",
+    "pop-has": "^1.0.0",
+    "q": "^2.0.3",
+    "q-io": "^2.0.2",
+    "qs": "^0.6.6",
+    "regexp-escape": "0.0.1",
     "saucelabs": ">=0.1.1 <0.2.0",
-    "url": ">=0.11",
-    "util": ">=0.10.3 <0.11.0",
+    "url": "^0.7.9",
+    "util": "^0.10.3",
     "wd": "^1.6.0"
   },
-  "devDependencies": {
-    "browserify": ">=3.38.1 <4.0.0"
-  },
   "scripts": {
-    "test": "node runner.js test",
-    "test:sauce": ". activate.sh; node test/sauce.js",
-    "deploy": ". activate.sh; node test/deploy.js"
+    "test": "npm run test:node && npm run test:phantom && npm run lint",
+    "test:node": "node runner.js test",
+    "test:phantom": "node phantom/runner.js test",
+    "deploy": "node scripts/deploy.js",
+    "saucelabs": "node scripts/saucelabs.js",
+    "lint": ""
   },
-  "sauce": {
-    "configurations": [
-      {
-        "browserName": "iphone",
-        "platform": "OS X 10.9",
-        "version": "7.1",
-        "device-orientation": "portrait"
-      },
-      {
-        "browserName": "android",
-        "platform": "Linux",
-        "version": "4.3",
-        "device-orientation": "portrait"
-      },
-      {
-        "browserName": "android",
-        "platform": "Linux",
-        "version": "4.3",
-        "device-orientation": "portrait",
-        "device-type": "tablet"
-      },
-      {
-        "browserName": "internet explorer",
-        "version": 10,
-        "platform": "Windows 8"
-      },
-      {
-        "browserName": "internet explorer",
-        "version": 11,
-        "platform": "Windows 8.1"
-      },
-      {
-        "browserName": "firefox",
-        "version": "28",
-        "platform": "OS X 10.9"
-      },
-      {
-        "browserName": "firefox",
-        "version": "28",
-        "platform": "Linux"
-      },
-      {
-        "browserName": "firefox",
-        "version": 28,
-        "platform": "Windows XP"
-      },
-      {
-        "browserName": "safari",
-        "version": "6",
-        "platform": "OS X 10.8"
-      },
-      {
-        "browserName": "safari",
-        "version": "7",
-        "platform": "OS X 10.9"
-      },
-      {
-        "browserName": "opera",
-        "version": 12,
-        "platform": "Linux"
-      },
-      {
-        "browserName": "chrome",
-        "version": "30",
-        "platform": "Linux"
-      },
-      {
-        "browserName": "chrome",
-        "version": "33",
-        "platform": "OS X 10.8"
-      },
-      {
-        "browserName": "chrome",
-        "version": "33",
-        "platform": "OS X 10.9"
-      }
-    ]
-  }
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/montagejs/jasminum.git"
+  },
+  "author": "Kris Kowal <kris@cixar.com>",
+  "license": "BSD 3-Clause",
+  "bugs": {
+    "url": "https://github.com/montagejs/jasminum/issues"
+  },
+  "homepage": "https://github.com/montagejs/jasminum"
 }

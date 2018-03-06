@@ -24,7 +24,7 @@ page.onError = function (message, trace) {
 };
 
 page.onResourceError = function (resourceError) {
-    console.log("Resource error: " + resourceError.url);
+    console.log("PhantomJS can't load resource " + resourceError.url);
 };
 
 page.open(system.args[1], function (status) {

@@ -1,5 +1,6 @@
 
 var Expectation = require("./expectation");
+var has = require("pop-has");
 
 module.exports = SpyExpectation;
 function SpyExpectation(value, report) {
@@ -26,7 +27,7 @@ SpyExpectation.prototype.toHaveBeenCalled = function () {
 
 SpyExpectation.prototype.toHaveBeenCalledWith = function () {
     var args = Array.prototype.slice.call(arguments);
-    var guard = Object.has(this.value.argsForCall, args, Object.equals);
+    var guard = has(this.value.argsForCall, args);
     if (this.value.displayName) {
         this.assert(
             guard,

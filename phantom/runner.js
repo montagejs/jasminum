@@ -17,16 +17,37 @@ var argv = optimist
 search(argv._).then(function (files) {
     return Require.findPackageLocationAndModuleId(files[0])
     .then(function (found) {
+        return Require.loadPackage(found.location);
+    })
+    .then(function (found) {
         var path = Require.locationToPath(found.location);
         var modules = files.map(function (file) {
             return Fs.relativeFromDirectory(path, file);
         });
 
+        var mrLocation = found.getPackage({name: "mr"}).location;
+        var mrPath = Require.locationToPath(mrLocation);
+        var mrRelPath = Fs.relativeFromDirectory(path, mrPath);
+        var bootPath = Fs.join("/", mrRelPath, "boot.js");
+
+        var jasminum = found.getPackage({name: "jasminum"});
+        var indexId = found.identify("phantom/index", jasminum);
+
+        var index = [
+            "<!DOCTYPE html>",
+            "<head>",
+            "<meta charset=\"utf-8\">",
+            // TODO protect against HTML injection
+            "<script src=\"" + bootPath + "\" data-module=\"" + indexId + "\"></script>",
+            "</head>",
+            "<body>",
+            "</body>",
+            "</html>"
+        ];
+
         var server = Joey
         .route(function ($) {
-            $("~/...").fileTree(Fs.join(__dirname, ".."), {
-                followInsecureSymbolicLinks: true
-            });
+            $("").method("GET").content(index, "text/html");
         })
         .fileTree(path, {followInsecureSymbolicLinks: true})
         .server();
@@ -37,10 +58,11 @@ search(argv._).then(function (files) {
             var port = server.address().port;
             var child = ChildProcess.spawn("phantomjs", [
                 Fs.join(__dirname, "script.js"),
-                "http://localhost:" + port + "/~/phantom/index.html?" + QS.stringify({
+                "http://localhost:" + port + "/?" + QS.stringify({
                     modules: modules,
                     failures: argv.f || argv.failures ? "show" : "hide",
-                    passes: argv.p || argv.passes ? "show" : "hide"
+                    passes: argv.p || argv.passes ? "show" : "hide",
+                    tty: process.stdout.isTTY ? "yes" : "no"
                 })
             ], {
                 stdio: [
@@ -48,6 +70,17 @@ search(argv._).then(function (files) {
                     process.stdout,
                     process.stderr
                 ]
+            });
+            child.on("error", function (cause) {
+                var error;
+                if (cause.code === "ENOENT") {
+                    error = new Error("Can't run tests. Install PhantomJS");
+                    error.code = cause.code;
+                    throw error;
+                } else {
+                    error = cause;
+                }
+                codeDeferred.reject(error);
             });
             child.on("close", function (code, signal) {
                 codeDeferred.resolve(code);
