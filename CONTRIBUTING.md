@@ -2,8 +2,7 @@
 ## Spectrum Browser Testing
 
 Testing this library against a spectrum of browsers involves several bits of
-infrastructure, which are each either very cheap or free for open source
-projects.
+infrastructure, which are each either very cheap or free for open source projects.
 You will need an Amazon Web Services (AWS) S3 account, for which you can expect
 to pay a couple bucks annually.
 You will also need a SauceLabs account, which is free for open source projects.

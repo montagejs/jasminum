@@ -1,7 +1,8 @@
-
 # Jasminum
 
-[![Release Compatibility Matrix](https://s3-us-west-2.amazonaws.com/jasminum/v2/saucelabs-matrix.svg)](https://saucelabs.com/u/kriskowal-jasminum)
+[![npm version](https://img.shields.io/npm/v/jasminum.svg?style=flat)](https://www.npmjs.com/package/jasminum)
+
+[![Build Status](https://travis-ci.org/montagejs/jasminum.svg?branch=master)](http://travis-ci.org/montagejs/jasminum)
 
 > *“Jasmine (taxonomic name Jasminum /ˈdʒæzmɨnəm/) is a genus of shrubs and
 > vines in the olive family (Oleaceae)”*
@@ -14,7 +15,7 @@ tests, and has an “isomorphic” API, meaning Jasminum tests can be run withou
 modification between Node.js and browsers using CommonJS module loaders
 including [Browserify][], [Mr][], or [Mop][].
 
-[Jasmine 1.3]: http://pivotal.github.io/jasmine/
+[Jasmine 1.3]: https://jasmine.github.io/
 [Browserify]: https://github.com/substack/node-browserify 
 [Mr]: https://github.com/montagejs/mr
 [Mop]: https://github.com/montagejs/mop
@@ -104,17 +105,10 @@ new Suite("my tests").describe(function () {
 }).runAndReport().done();
 ```
 
-Jasminum can be installed with `npm`. Make sure you have a `package.json`; `npm
-init` will walk you through that.
-
-Add Jasminum to your package with `npm install jasminum --save-dev` and create a
-test script so that it will run with `npm test`.
+Create a test script in your `package.json`:
 
 ```json
 {
-    "devDependencies": {
-        "jasminum": "~1.0"
-    },
     "scripts": {
         "test": "node test/index.js"
     }
@@ -206,6 +200,7 @@ override its `Promise` property, or just pass `Promise` as an option to
 Several small libaries establish foundations that Jasminum employs for
 comparing values, particularly polymorphic `pop-equals`, `pop-compare`,
 and `pop-has` operators, as well as the non-polymorphic `is` operator.
+
 These do not behave exactly the same way as Jasmine, but are designed with
 extensibility in mind both within and beyond testing. Partcularly, “any” objects
 simply override their “equals” method to recognize any object of the same type
@@ -262,12 +257,12 @@ standard output and console messages. In the browser, the inspected window is
 left as a stage for the application under test and the test runner will only
 fiddle with the `testing`, `pass`, and `fail` classes of the `body` element.
 
-In addition to `describe` and `it, Jasmine and Jasminum both support `xdescribe`
+In addition to `describe` and `it`, Jasmine and Jasminum both support `xdescribe`
 and `xit` to quickly or temporarily disable a test. In addition, Jasminum
 [supports][iidd] `ddescribe` and `iit` that will cause the test runner to focus
 on the annotated suites or tests.
 
-[iidd]: https://github.com/pivotal/jasmine/pull/181
+[iidd]: https://github.com/jasmine/jasmine/pull/181
 
 ## Light
 
@@ -331,8 +326,8 @@ where the expectation has been negated and gives the reporter great flexibility
 in rendering the involved objects and negating the messages.
 
 ```js
-function FunnyExpectation(value, report) {
-    Expectation.call(this, value, report);
+function FunnyExpectation(value, report, test) {
+    Expectation.call(this, value, report, test);
     // Also sets up the .not.isNot = true, .not.not = this stuff
 };
 

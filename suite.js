@@ -93,8 +93,11 @@ Suite.prototype.run = function (report, Promise) {
             suiteReport.skip(self);
         }
     })
-    .finally(function () {
+    .then(function () {
         suiteReport.end(self);
+    }, function (error) {
+        suiteReport.end(self);
+        throw error;
     });
 
 };

@@ -1,4 +1,17 @@
 
+if (!console.group) {
+    console.group = console.log;
+    console.groupEnd = console.log;
+}
+
+if (!console.error) {
+    console.error = console.log;
+}
+
+if (!console.warn) {
+    console.warn = console.log;
+}
+
 var body = document.querySelector("body");
 body.classList.add("testing");
 

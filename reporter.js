@@ -125,8 +125,20 @@ Reporter.prototype.assert = function (guard, isNot, messages, objects) {
     }
     if (!passed && !this.test.shouldFail) {
         var stack = annotateStackTrace(getStackTrace());
-        if (stack) {
-            console.log(stack);
+    }
+    if (passed) { // passed
+        if (this.test.shouldFail) { // but should fail
+            this.failed = false;
+        } else { // and passed
+            this.root.passedAssertions++;
+        }
+    } else { // failed
+        if (!this.test.shouldFail) { // but should pass
+            this.failed = true;
+            this.root.failedAssertions++;
+        } else { // and should fail
+            this.failed = false;
+            this.root.passedAssertions++;
         }
     }
     if (passed) { // passed

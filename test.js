@@ -29,8 +29,13 @@ Test.prototype.run = function (report, Promise) {
             .then(function () {
                 return self.call(self.callback, Promise, context, report, "during");
             })
-            .finally(function () {
+            .then(function () {
                 return self.afterEach(Promise, context, report);
+            }, function (error) {
+                return self.afterEach(Promise, context, report)
+                .then(function () {
+                    throw error;
+                });
             })
         } else {
             report.skip(self);
@@ -41,10 +46,15 @@ Test.prototype.run = function (report, Promise) {
     }, function (error) {
         report.error(error, self);
     })
-    .finally(function () {
+    .then(function () {
         report.end(self);
         setCurrentTest();
         setCurrentReport();
+    }, function (error) {
+        report.end(self);
+        setCurrentTest();
+        setCurrentReport();
+        throw error;
     });
 };
 

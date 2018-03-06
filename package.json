@@ -13,13 +13,14 @@
     "promise",
     "isomorphic"
   ],
+  "license": "BSD-3-Clause",
   "main": "jasminum.js",
   "bin": {
     "jasminum": "runner.js",
     "jasminum-phantom": "phantom/runner.js"
   },
   "browser": {
-    "platform-reporter": "browser/reporter"
+    "./platform-reporter.js": "browser/reporter.js"
   },
   "dependencies": {
     "colors": "^0.6.2",
