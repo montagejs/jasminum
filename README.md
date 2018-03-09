@@ -2,8 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/jasminum.svg?style=flat)](https://www.npmjs.com/package/jasminum)
 
-[![Build Status](https://travis-ci.org/montagejs/jasminum.svg?branch=master)](http://travis-ci.org/montagejs/jasminum)
-
+[![Build Status](https://travis-ci.org/montagejs/jasminum.svg?branch=v1)](https://travis-ci.org/montagejs/jasminum)
 
 > *“Jasmine (taxonomic name Jasminum /ˈdʒæzmɨnəm/) is a genus of shrubs and
 > vines in the olive family (Oleaceae)”*
