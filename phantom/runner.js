@@ -17,9 +17,16 @@ var argv = optimist
 search(argv._).then(function (files) {
     return Require.findPackageLocationAndModuleId(files[0])
     .then(function (found) {
-        return Require.loadPackage(found.location);
-    })
-    .then(function (found) {
+        return Require.loadPackage(found.location)
+        .then(function (package) {
+            return package.loadPackage({name: "jasminum"})
+            .then(function () {
+                return run(package);
+            });
+        });
+    });
+
+    function run(found) {
         var path = Require.locationToPath(found.location);
         var modules = files.map(function (file) {
             return Fs.relativeFromDirectory(path, file);
@@ -88,7 +95,7 @@ search(argv._).then(function (files) {
             return codeDeferred.promise;
         })
         .finally(server.stop);
-    })
+    }
 })
 .done(process.exit);
 
